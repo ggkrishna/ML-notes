@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Mathematical Guide: Machine Learning in Healthcare</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" xintegrity="sha384-wcIxkf4k558dRKaPBOOTcvgtSYpolSSgGcVpLGYA/ElPj+yBI+wNriSjE+hYsFzN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" xintegrity="sha384-hIoBPnHW1vjMhA34A6zFhM/A1GcnSkA0zH/rKW3bV0PHhDkMhNl/NzSjMshC3/G1" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" xintegrity="sha384-43gviGvBIs1ce2SwnwqTKQQeGzVwGfVvBrmoP4GtcJ/sWnI1GMusXIcvkLKSKnDk" crossorigin="anonymous"></script>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+      .chart-container {
+        position: relative;
+        width: 100%;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        height: 350px;
+        max-height: 400px;
+      }
+      .flow-box {
+        border: 2px solid #205A70;
+        background-color: rgba(86, 160, 169, 0.1);
+        color: #0B2D48;
+      }
+      .flow-arrow {
+        color: #205A70;
+        font-size: 2rem;
+        line-height: 1;
+      }
+      .tree-node {
+        border: 2px solid #205A70;
+        background-color: white;
+        color: #0B2D48;
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        min-width: 100px;
+      }
+      .tree-branch {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .tree-line {
+        height: 20px;
+        width: 2px;
+        background-color: #56A0A9;
+      }
+      .tree-line-h {
+        height: 2px;
+        background-color: #56A0A9;
+        width: 100%;
+      }
+      .neuron-layer {
+        background-color: rgba(86, 160, 169, 0.1);
+        border-radius: 0.5rem;
+        padding: 1rem 0.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+        min-width: 60px;
+      }
+      .neuron {
+        background-color: #205A70;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+      }
+      nav a {
+        transition: color 0.2s ease-in-out;
+      }
+      nav a:hover {
+        color: #F9A03F;
+      }
+      .math-formula {
+        padding: 0.75rem 0;
+        margin: 1rem 0;
+        font-size: 1.1em;
+        overflow-x: auto;
+        text-align: center;
+      }
+      .katex-display {
+        margin: 0.5em 0;
+      }
+      .math-inline {
+        font-size: 1.05em;
+      }
+    </style>
+</head>
+<body class="bg-[#F8F8F8] text-[#0B2D48] leading-relaxed">
+
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto p-6 md:p-10 text-center">
+            <h1 class="text-3xl md:text-5xl font-bold text-[#205A70] mb-3">
+                A Mathematical Guide: Machine Learning in Healthcare
+            </h1>
+            <p class="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto">
+                Exploring the equations, optimization objectives, and algorithms that power modern healthcare AI.
+            </p>
+        </div>
+    </header>
+
+    <nav class="sticky top-0 bg-[#0B2D48] text-white p-4 shadow-lg z-10">
+        <div class="container mx-auto flex justify-center space-x-4 md:space-x-8 overflow-x-auto whitespace-nowrap">
+            <a href="#section1" class="font-medium px-2 py-1">Formal Intro</a>
+            <a href="#section2" class="font-medium px-2 py-1">Regression Models</a>
+            <a href="#section3" class="font-medium px-2 py-1">KNN</a>
+            <a href="#section4" class="font-medium px-2 py-1">Decision Trees</a>
+            <a href="#section5" class="font-medium px-2 py-1">Neural Networks</a>
+            <a href="#section6" class="font-medium px-2 py-1">Other Models</a>
+            <a href="#section7" class="font-medium px-2 py-1">Ethics</a>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section id="section1" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">1. A Formal Introduction to Learning</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                At its core, machine learning seeks to find a function <span class="math-inline">\(f\)</span> that maps inputs <span class="math-inline">\(\mathbf{x}\)</span> (patient features) to outputs <span class="math-inline">\(y\)</span> (diagnosis, risk score). This function is "learned" by minimizing a <strong>loss function</strong> over a dataset <span class="math-inline">\(D\)</span>.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Supervised Learning (Task-Driven)</h3>
+                    <p class="text-gray-700 mb-4">Given a labeled dataset <span class="math-inline">\(D = \{(\mathbf{x}_i, y_i)\}_{i=1}^{N}\)</span>, the goal is to find a function <span class="math-inline">\(f\)</span> that minimizes the <strong>Empirical Risk</strong> (average loss):</p>
+                    <div class="math-formula">
+                        $$R(f) = \frac{1}{N} \sum_{i=1}^{N} L(f(\mathbf{x}_i), y_i)$$
+                    </div>
+                    <p class="text-gray-700 mt-4">Where <span class="math-inline">\(L\)</span> is a <strong>loss function</strong> (e.g., Mean Squared Error for regression, Cross-Entropy for classification) that measures the penalty for an incorrect prediction.</p>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Unsupervised Learning (Data-Driven)</h3>
+                    <p class="text-gray-700 mb-4">Given an unlabeled dataset <span class="math-inline">\(D = \{\mathbf{x}_i\}_{i=1}^{N}\)</span>, the goal is to find hidden structure. This is not optimized against a single loss function, but rather objectives like:</p>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2">
+                        <li><strong>Clustering:</strong> Grouping data into <span class="math-inline">\(k\)</span> clusters to minimize within-cluster variance.</li>
+                        <li><strong>Dimensionality Reduction:</strong> Projecting data <span class="math-inline">\(\mathbf{x}\)</span> into a lower-dimensional space <span class="math-inline">\(\mathbf{z}\)</span> while preserving as much variance as possible.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="section2" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">2. Core Parametric Models: Regression</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                Regression models are parametric, meaning they define a fixed-form function <span class="math-inline">\(f(\mathbf{x}, \mathbf{w})\)</span> with parameters (or weights) <span class="math-inline">\(\mathbf{w}\)</span> that are learned from the data.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Linear Regression: The Model</h3>
+                    <p class="text-gray-700 mb-4">Assumes a linear relationship. The prediction <span class="math-inline">\(\hat{y}\)</span> ("y-hat") is a weighted sum of input features <span class="math-inline">\(\mathbf{x}\)</span>:</p>
+                    <div class="math-formula">$$\hat{y} = w_0 + w_1x_1 + \dots + w_nx_n = \mathbf{w}^T\mathbf{x}$$</div>
+                    <p class="text-gray-700 mb-4">Weights <span class="math-inline">\(\mathbf{w}\)</span> are found by minimizing the <strong>Mean Squared Error (MSE)</strong>, typically via Gradient Descent or the analytical <strong>Normal Equation</strong>.</p>
+                    <div class="math-formula">$$L(\mathbf{w}) = \frac{1}{N} \sum_{i=1}^{N} (y_i - \mathbf{w}^T\mathbf{x}_i)^2$$</div>
+                    <div class="chart-container">
+                        <canvas id="linearRegressionChart"></canvas>
+                    </div>
+                    <p class="mt-6 text-gray-600 text-sm italic text-center">
+                        This chart visualizes the <strong>Ordinary Least Squares (OLS)</strong> best-fit line that minimizes the sum of squared residuals (vertical distances) for the data.
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Logistic Regression: The Model</h3>
+                    <p class="text-gray-700 mb-4">Adapts linear regression for binary (0/1) classification. It maps the linear output <span class="math-inline">\(z = \mathbf{w}^T\mathbf{x}\)</span> to a probability using the <strong>sigmoid function</strong> (<span class="math-inline">\(\sigma\)</span>):</p>
+                    <div class="math-formula">$$P(y=1 | \mathbf{x}) = \hat{y} = \sigma(\mathbf{w}^T\mathbf{x}) = \frac{1}{1 + e^{-\mathbf{w}^T\mathbf{x}}}$$</div>
+                    <p class="text-gray-700 mb-4">It's trained by minimizing the <strong>Binary Cross-Entropy (Log Loss)</strong>, as MSE is non-convex for this problem.</p>
+                    <div class="math-formula">$$L(\mathbf{w}) = -\frac{1}{N} \sum_{i=1}^{N} [y_i \log(\hat{y}_i) + (1-y_i) \log(1-\hat{y}_i)]$$</div>
+                    <div class="chart-container">
+                        <canvas id="logisticRegressionChart"></canvas>
+                    </div>
+                     <p class="mt-6 text-gray-600 text-sm italic text-center">
+                        The logistic S-curve maps any real-valued linear output to a probability between 0 and 1, allowing for a decision boundary (e.g., at P=0.5).
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="section3" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">3. Non-Parametric: K-Nearest Neighbors (KNN)</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                KNN is an "instance-based" or "lazy" learning algorithm. It makes no assumptions about the underlying data distribution (non-parametric) and simply stores the entire training set.
+            </p>
+            <div class="grid grid-cols-1 gap-8">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">The KNN Algorithm</h3>
+                    <p class="text-gray-700 mb-4">To classify a new point <span class="math-inline">\(\mathbf{x}_{\text{new}}\)</span>:</p>
+                    <ol class="list-decimal list-inside text-gray-700 space-y-2 mb-4">
+                        <li>Choose a value for <span class="math-inline">\(K\)</span> (e.g., K=5) and a <strong>distance metric</strong>.</li>
+                        <li>A common metric is <strong>Euclidean Distance</strong>:
+                            <div class="math-formula">$$d(\mathbf{p}, \mathbf{q}) = \sqrt{ \sum_{i=1}^{n} (p_i - q_i)^2 }$$</div>
+                        </li>
+                        <li>Find the <span class="math-inline">\(K\)</span> training samples (<span class="math-inline">\(\mathbf{x}_1, \dots, \mathbf{x}_K\)</span>) closest to <span class="math-inline">\(\mathbf{x}_{\text{new}}\)</span>.</li>
+                        <li><strong>Classification:</strong> Predict <span class="math-inline">\(\hat{y}_{\text{new}}\)</span> as the <strong>majority class</strong> of the K neighbors.</li>
+                        <li><strong>Regression:</strong> Predict <span class="math-inline">\(\hat{y}_{\text{new}}\)</span> as the <strong>average value</strong> of the K neighbors.</li>
+                    </ol>
+                    <div class="chart-container">
+                        <canvas id="knnChart"></canvas>
+                    </div>
+                    <p class="mt-6 text-gray-600 text-sm italic text-center">
+                        Here, with K=5, the 5 nearest neighbors to the new point (orange) are found. The majority class (3 'Disease' vs. 2 'Healthy') determines its prediction.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="section4" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">4. Interpretable Decisions: Trees and Forests</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                Decision Trees are non-parametric models that learn a hierarchy of "if-then" rules. Random Forests improve their stability by averaging many trees.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Building a Decision Tree (CART)</h3>
+                    <p class="text-gray-700 mb-4">Trees are built by recursively finding the "best" split (feature <span class="math-inline">\(j\)</span> and threshold <span class="math-inline">\(t\)</span>) that maximizes <strong>Information Gain</strong>. This is equivalent to minimizing the weighted impurity of the child nodes.</p>
+                    <p class="text-gray-700 mb-4">Common impurity measures for a node with class proportions <span class="math-inline">\(p\)</span>:</p>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2">
+                        <li><strong>Gini Impurity:</strong> <span class="math-inline">\(G(p) = 1 - \sum_{k} p_k^2\)</span></li>
+                        <li><strong>Entropy:</strong> <span class="math-inline">\(H(p) = - \sum_{k} p_k \log_2(p_k)\)</span></li>
+                    </ul>
+                    <div class="math-formula">$$\text{Gain} = \text{Impurity}(\text{parent}) - [w_L \cdot \text{Impurity}(L) + w_R \cdot \text{Impurity}(R)]$$</div>
+                    <div class="flex flex-col items-center text-center mt-6">
+                        <div class="tree-node">Chest Pain? <span class="math-inline">\((Gini = 0.48)\)</span></div>
+                        <div class="flex w-full mt-2">
+                            <div class="w-1/2 text-sm text-gray-600 pr-4 text-right">Yes</div>
+                            <div class="w-1/2 text-sm text-gray-600 pl-4 text-left">No</div>
+                        </div>
+                        <div class="flex w-full">
+                            <div class="tree-branch w-1/2">
+                                <div class="tree-line"></div>
+                                <div class="font-medium text-sm text-[#205A70]">Yes</div>
+                                <div class="tree-line"></div>
+                                <div class="tree-node bg-[#205A70] text-white">Triage: High <span class="math-inline">\((Gini = 0.0)\)</span></div>
+                            </div>
+                            <div class="tree-branch w-1/2">
+                                <div class="tree-line"></div>
+                                <div class="font-medium text-sm text-gray-600">No</div>
+                                <div class="tree-line"></div>
+                                <div class="tree-node">Fever > 101°F? <span class="math-inline">\((Gini = 0.32)\)</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Ensemble: Random Forest</h3>
+                    <p class="text-gray-700 mb-4">A single tree has high variance. A Random Forest is an <strong>ensemble</strong> of <span class="math-inline">\(B\)</span> decorrelated trees. It uses two key techniques:</p>
+                    <ol class="list-decimal list-inside text-gray-700 space-y-2 mb-4">
+                        <li><strong>Bagging (Bootstrap Aggregating):</strong> Each tree <span class="math-inline">\(f_s\)</span> is trained on a different bootstrap sample (a random sample of data *with replacement*).</li>
+                        <li><strong>Feature Randomness:</strong> At each split, only a random subset of <span class="math-inline">\(m\)</span> features (where <span class="math-inline">\(m < \text{total features}\)</span>) is considered.</li>
+                    </ol>
+                    <p class="text-gray-700 mb-4">The final prediction is the <strong>majority vote</strong> (for classification) or <strong>average</strong> (for regression) of all B trees.</p>
+                    <div class="math-formula">$$\hat{y}_{\text{rf}} = \text{majority\_vote}( \{ f_s(\mathbf{x}) \}_{s=1}^{B} )$$</div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="section5" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">5. Introduction to Neural Networks</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                Deep Learning models (Neural Networks) are powerful function approximators composed of layers of "neurons."
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">The Feedforward Neuron</h3>
+                    <p class="text-gray-700 mb-4">A single neuron computes a weighted sum of its inputs, adds a bias <span class="math-inline">\(b\)</span>, and passes the result through a non-linear <strong>activation function <span class="math-inline">\(g(z)\)</span></strong> (like ReLU or sigmoid).</p>
+                    <div class="math-formula">$$a = g(\mathbf{w}^T\mathbf{x} + b)$$</div>
+                    <p class="text-gray-700 mb-4">A full layer <span class="math-inline">\(l\)</span> is a vector of these operations, computing <span class="math-inline">\(\mathbf{a}^{(l)}\)</span> from the previous layer's activations <span class="math-inline">\(\mathbf{a}^{(l-1)}\)</span>:</p>
+                    <div class="math-formula">$$\mathbf{a}^{(l)} = g( \mathbf{W}^{(l)}\mathbf{a}^{(l-1)} + \mathbf{b}^{(l)} )$$</div>
+                    <p class="text-gray-700 mb-4">The entire network is trained using <strong>Backpropagation</strong> (an application of the chain rule) to compute the gradient of the loss function w.r.t. all weights <span class="math-inline">\(\mathbf{W}\)</span> and biases <span class="math-inline">\(\mathbf{b}\)</span>.</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Key Deep Learning Architectures</h3>
+                    <p class="text-gray-700 mb-4">Different architectures are specialized for different data types:</p>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                        <li><strong>Convolutional NN (CNN):</strong> Uses "convolution" filters to learn spatial hierarchies. Dominant in medical image analysis.</li>
+                        <li><strong>Recurrent NN (RNN/LSTM):</strong> Models sequential data by maintaining a hidden state. Used for time-series (EHR data, vitals).</li>
+                        <li><strong>Transformers:</strong> Use a "self-attention" mechanism to weigh the importance of different inputs. State-of-the-art for NLP (clinical notes).</li>
+                    </ul>
+                    <div class="chart-container" style="height: 300px;">
+                        <canvas id="dlArchitecturesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section6" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">6. Beyond the Basics: Other Powerful Models</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                The healthcare industry also leverages other sophisticated techniques to analyze complex data, from identifying patient groups to understanding clinical notes.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">K-Means Clustering (Unsupervised)</h3>
+                    <p class="text-gray-700 mb-4">An iterative algorithm to partition <span class="math-inline">\(N\)</span> data points into <span class="math-inline">\(K\)</span> clusters. It minimizes the <strong>Within-Cluster Sum of Squares (WCSS)</strong>:</p>
+                    <div class="math-formula">$$J = \sum_{k=1}^{K} \sum_{\mathbf{x}_i \in C_k} ||\mathbf{x}_i - \mathbf{\mu}_k||^2$$</div>
+                    <p class="text-gray-700 mb-4">Where <span class="math-inline">\(\mathbf{\mu}_k\)</span> is the <strong>centroid</strong> (mean) of cluster <span class="math-inline">\(C_k\)</span>. It iterates between:</p>
+                    <ol class="list-decimal list-inside text-gray-700 space-y-1">
+                        <li><strong>Assign Step:</strong> Assign each point <span class="math-inline">\(\mathbf{x}_i\)</span> to its nearest centroid <span class="math-inline">\(\mathbf{\mu}_k\)</span>.</li>
+                        <li><strong>Update Step:</strong> Recalculate each centroid <span class="math-inline">\(\mathbf{\mu}_k\)</span> as the mean of all points assigned to it.</li>
+                    </ol>
+                    <div class="chart-container">
+                        <canvas id="kmeansChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Support Vector Machines (SVM)</h3>
+                    <p class="text-gray-700 mb-4">A classification model that finds the optimal hyperplane <span class="math-inline">\(\mathbf{w}^T\mathbf{x} - b = 0\)</span> that <strong>maximizes the margin</strong> (the distance) between the two classes.</p>
+                    <p class="text-gray-700 mb-4">This is a constrained optimization problem:</p>
+                    <div class="math-formula">$$\min_{\mathbf{w}, b} \frac{1}{2} ||\mathbf{w}||^2 \quad \text{s.t.} \quad y_i(\mathbf{w}^T\mathbf{x}_i - b) \ge 1$$</div>
+                    <p class="text-gray-700 mb-4">The <strong>Kernel Trick</strong> (e.g., RBF kernel) allows SVMs to find non-linear boundaries by implicitly mapping data to a higher-dimensional space.</p>
+                    <div class="chart-container">
+                        <canvas id="svmChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section7" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">7. Ethical & Practical Considerations</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                The mathematics are objective, but the data they are trained on is not. Biased data (e.g., under-representing certain demographics) will lead to a model <span class="math-inline">\(f\)</span> that minimizes loss for the majority group, performing poorly and unfairly for minorities.
+            </p>
+            <div class="grid grid-cols-1 gap-8">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Pillars of Responsible AI in Healthcare</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+                        <div class="p-4">
+                            <span class="text-6xl">⚖️</span>
+                            <h4 class="font-bold text-xl my-2">Fairness & Bias</h4>
+                            <p class="text-gray-600">Ensuring the loss function <span class="math-inline">\(L\)</span> and dataset <span class="math-inline">\(D\)</span> do not lead to discriminatory predictions.</p>
+                        </div>
+                        <div class="p-4">
+                            <span class="text-6xl">🔒</span>
+                            <h4 class="font-bold text-xl my-2">Privacy & Security</h4>
+                            <p class="text-gray-600">Protecting sensitive patient data <span class="math-inline">\(\mathbf{x}_i\)</span>, often using techniques like differential privacy.</p>
+                        </div>
+                        <div class="p-4">
+                            <span class="text-6xl">🔎</span>
+                            <h4 class="font-bold text-xl my-2">Transparency</h4>
+                            <p class="text-gray-600">Using interpretable models (like trees, LIME, SHAP) to understand *why* <span class="math-inline">\(f(\mathbf{x})\)</span> made its prediction.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center p-8 text-gray-600 bg-[#F8F8F8] border-t border-gray-200">
+        <p>This infographic provides a mathematical overview of machine learning concepts.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false},
+                    {left: '\\(', right: '\\)', display: false},
+                    {left: '\\[', right: '\\]', display: true}
+                ],
+                throwOnError : false
+            });
+
+            const colorPrimary = '#205A70';
+            const colorSecondary = '#56A0A9';
+            const colorAccent = '#F9A03F';
+            const colorLight = '#C2C2C2';
+            const colorBg = 'rgba(86, 160, 169, 0.1)';
+            const colorRiskHigh = '#F9A03F';
+            const colorRiskLow = '#205A70';
+            const colorUnknown = '#FBC17D';
+
+            const tooltipTitleCallback = (tooltipItems) => {
+              const item = tooltipItems[0];
+              let label = item.chart.data.labels[item.dataIndex];
+              if (Array.isArray(label)) {
+                return label.join(' ');
+              } else {
+                return label;
+              }
+            };
+            
+            const defaultChartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: tooltipTitleCallback
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false }
+                    },
+                    y: {
+                        grid: { color: '#eee' }
+                    }
+                }
+            };
+
+            const processLabels = (labels, maxWidth = 16) => {
+                return labels.map(label => {
+                    if (label.length <= maxWidth) return label;
+                    let lines = [];
+                    let currentLine = '';
+                    const words = label.split(' ');
+                    for (const word of words) {
+                        if ((currentLine + ' ' + word).trim().length > maxWidth) {
+                            lines.push(currentLine.trim());
+                            currentLine = word;
+                        } else {
+                            currentLine = (currentLine + ' ' + word).trim();
+                        }
+                    }
+                    if (currentLine) lines.push(currentLine.trim());
+                    return lines;
+                });
+            };
+
+            if (document.getElementById('linearRegressionChart')) {
+                const ctxLinear = document.getElementById('linearRegressionChart').getContext('2d');
+                const ageVsBpData = [
+                    {x: 40, y: 120}, {x: 45, y: 122}, {x: 50, y: 128}, {x: 55, y: 130},
+                    {x: 60, y: 135}, {x: 65, y: 138}, {x: 70, y: 142}, {x: 75, y: 144}
+                ];
+                new Chart(ctxLinear, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Patient Data (Age, BP)',
+                                data: ageVsBpData,
+                                backgroundColor: colorSecondary,
+                                type: 'scatter'
+                            },
+                            {
+                                label: 'OLS Regression Line',
+                                data: [{x: 40, y: 118}, {x: 75, y: 145}],
+                                type: 'line',
+                                fill: false,
+                                borderColor: colorAccent,
+                                borderWidth: 3
+                            }
+                        ]
+                    },
+                    options: {
+                        ...defaultChartOptions,
+                        scales: {
+                            x: { title: { display: true, text: 'Age' }, grid: { display: false } },
+                            y: { title: { display: true, text: 'Systolic Blood Pressure' }, grid: { color: '#eee' } }
+                        }
+                    }
+                });
+            }
+
+            if (document.getElementById('logisticRegressionChart')) {
+                const ctxLogistic = document.getElementById('logisticRegressionChart').getContext('2d');
+                const logisticCurve = Array.from({length: 100}, (_, i) => {
+                    const x = (i - 50) / 10;
+                    const y = 1 / (1 + Math.exp(-x));
+                    return {x: x, y: y};
+                });
+                const logisticData = [
+                    {x: -5, y: 0.05}, {x: -4, y: 0.1}, {x: -3, y: 0.15}, {x: -2, y: 0.3}, {x: -1, y: 0.4},
+                    {x: 1, y: 0.6}, {x: 2, y: 0.7}, {x: 3, y: 0.85}, {x: 4, y: 0.9}, {x: 5, y: 0.95}
+                ];
+                
+                new Chart(ctxLogistic, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Patient Data (0 or 1)',
+                                data: logisticData,
+                                backgroundColor: colorSecondary
+                            },
+                            {
+                                label: 'Logistic Function σ(z)',
+                                data: logisticCurve,
+                                type: 'line',
+                                fill: false,
+                                borderColor: colorAccent,
+                                borderWidth: 3,
+                                pointRadius: 0
+                            }
+                        ]
+                    },
+                    options: {
+                        ...defaultChartOptions,
+                        scales: {
+                            x: { title: { display: true, text: 'Linear Score (z = wᵀx)' }, grid: { display: false } },
+                            y: { title: { display: true, text: 'Probability P(y=1)' }, min: 0, max: 1, grid: { color: '#eee' } }
+                        }
+                    }
+                });
+            }
+
+            if (document.getElementById('knnChart')) {
+                const ctxKnn = document.getElementById('knnChart').getContext('2d');
+                const classA = [{x: 2, y: 3}, {x: 3, y: 4}, {x: 4, y: 2}, {x: 2.5, y: 2}, {x: 3.5, y: 3}];
+                const classB = [{x: 7, y: 8}, {x: 8, y: 9}, {x: 9, y: 7}, {x: 7.5, y: 7}, {x: 8.5, y: 8}];
+                const unknown = [{x: 5, y: 6}];
+                
+                new Chart(ctxKnn, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Class A (Healthy)',
+                                data: classA,
+                                backgroundColor: colorSecondary,
+                                pointRadius: 6
+                            },
+                            {
+                                label: 'Class B (Disease)',
+                                data: classB,
+                                backgroundColor: colorPrimary,
+                                pointRadius: 6
+                            },
+                            {
+                                label: 'Unknown Patient (x_new)',
+                                data: unknown,
+                                backgroundColor: colorUnknown,
+                                pointRadius: 8,
+                                pointStyle: 'rectRot',
+                                borderWidth: 2,
+                                borderColor: colorAccent
+                            }
+                        ]
+                    },
+                    options: {
+                        ...defaultChartOptions,
+                        scales: {
+                            x: { title: { display: true, text: 'Biomarker 1' }, grid: { display: false } },
+                            y: { title: { display: true, text: 'Biomarker 2' }, grid: { color: '#eee' } }
+                        }
+                    }
+                });
+            }
+
+            if (document.getElementById('dlArchitecturesChart')) {
+                const ctxDL = document.getElementById('dlArchitecturesChart').getContext('2d');
+                const labels = processLabels(['Convolutional Neural Networks (CNNs)', 'Recurrent Neural Networks (RNNs)', 'Transformers (Attention)']);
+                new Chart(ctxDL, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Typical Use-Case Impact',
+                            data: [95, 80, 90],
+                            backgroundColor: [
+                                colorPrimary,
+                                colorAccent,
+                                colorSecondary
+                            ],
+                            borderColor: colorPrimary,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        ...defaultChartOptions,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: tooltipTitleCallback
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: { display: true, text: 'Problem-Fit Score (out of 100)' },
+                                grid: { color: '#eee' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (document.getElementById('kmeansChart')) {
+                const ctxKmeans = document.getElementById('kmeansChart').getContext('2d');
+                new Chart(ctxKmeans, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Cluster 1',
+                                data: [{x: 2, y: 3}, {x: 2.5, y: 3.5}, {x: 1.5, y: 2.5}, {x: 3, y: 2}],
+                                backgroundColor: colorPrimary,
+                                pointRadius: 6
+                            },
+                            {
+                                label: 'Cluster 2',
+                                data: [{x: 7, y: 8}, {x: 7.5, y: 8.5}, {x: 6.5, y: 7.5}, {x: 8, y: 7}],
+                                backgroundColor: colorSecondary,
+                                pointRadius: 6
+                            },
+                            {
+                                label: 'Cluster 3 (Centroid μ₃)',
+                                data: [{x: 2.5, y: 8.125}],
+                                backgroundColor: colorAccent,
+                                pointRadius: 10,
+                                pointStyle: 'crossRot',
+                                borderWidth: 3,
+                                borderColor: colorAccent
+                            },
+                            {
+                                label: 'Cluster 3 Points',
+                                data: [{x: 2, y: 8}, {x: 3.5, y: 8.5}, {x: 1.5, y: 7.5}, {x: 3, y: 9}],
+                                backgroundColor: 'rgba(249, 160, 63, 0.5)',
+                                pointRadius: 6
+                            }
+                        ]
+                    },
+                    options: {
+                        ...defaultChartOptions,
+                        plugins: {
+                            tooltip: { callbacks: { title: tooltipTitleCallback }},
+                            legend: {
+                                labels: {
+                                    filter: item => item.text && !item.text.includes('Points')
+                                }
+                            }
+                        },
+                        scales: {
+                            x: { 
+                                title: { display: true, text: 'Biomarker A' },
+                                grid: { display: false }
+                            },
+                            y: { 
+                                title: { display: true, text: 'Biomarker B' },
+                                grid: { color: '#eee' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (document.getElementById('svmChart')) {
+                const ctxSvm = document.getElementById('svmChart').getContext('2d');
+                new Chart(ctxSvm, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Class 1 (y = +1)',
+                                data: [{x: 2, y: 3}, {x: 2.5, y: 4.5}, {x: 1.5, y: 2.5}, {x: 3, y: 2}, {x: 4, y: 5}],
+                                backgroundColor: colorPrimary,
+                                type: 'scatter'
+                            },
+                            {
+                                label: 'Class 2 (y = -1)',
+                                data: [{x: 7, y: 8}, {x: 7.5, y: 9.5}, {x: 6.5, y: 7.5}, {x: 8, y: 7}, {x: 6, y: 8.5}],
+                                backgroundColor: colorSecondary,
+                                type: 'scatter'
+                            },
+                            {
+                                label: 'Max-Margin Hyperplane (wᵀx-b=0)',
+                                data: [{x: 0, y: 6.5}, {x: 10, y: 4.5}],
+                                backgroundColor: colorAccent,
+                                borderColor: colorAccent,
+                                type: 'line',
+                                fill: false,
+                                borderWidth: 3,
+                                pointRadius: 0
+                            },
+                            {
+                                label: 'Margin Gutters',
+                                data: [{x: 0, y: 8}, {x: 10, y: 6}],
+                                borderColor: 'rgba(249, 160, 63, 0.5)',
+                                type: 'line',
+                                fill: false,
+                                borderWidth: 1,
+                                borderDash: [5, 5],
+                                pointRadius: 0
+                            },
+                            {
+                                label: 'Margin Gutters',
+                                data: [{x: 0, y: 5}, {x: 10, y: 3}],
+                                borderColor: 'rgba(249, 160, 63, 0.5)',
+                                type: 'line',
+                                fill: false,
+                                borderWidth: 1,
+                                borderDash: [5, 5],
+                                pointRadius: 0
+                            }
+                        ]
+                    },
+                    options: {
+                        ...defaultChartOptions,
+                        plugins: {
+                            tooltip: { callbacks: { title: tooltipTitleCallback }},
+                            legend: {
+                                labels: {
+                                    filter: item => item.text && !item.text.includes('Gutters')
+                                }
+                            }
+                        },
+                        scales: {
+                            x: { 
+                                title: { display: true, text: 'Tumor Radius' },
+                                grid: { display: false }
+                            },
+                            y: { 
+                                title: { display: true, text: 'Tumor Texture' },
+                                grid: { color: '#eee' }
+                            }
+                        }
+                    }
+                });
+            }
+
+        });
+    </script>
+</body>
+</html>
+
+
