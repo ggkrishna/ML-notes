@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Practical Guide: ML in Healthcare with Python</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+      .chart-container {
+        position: relative;
+        width: 100%;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        height: 350px;
+        max-height: 400px;
+      }
+      .flow-box {
+        border: 2px solid #205A70;
+        background-color: rgba(86, 160, 169, 0.1);
+        color: #0B2D48;
+      }
+      .flow-arrow {
+        color: #205A70;
+        font-size: 2rem;
+        line-height: 1;
+      }
+      .tree-node {
+        border: 2px solid #205A70;
+        background-color: white;
+        color: #0B2D48;
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        min-width: 100px;
+      }
+      .tree-branch {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .tree-line {
+        height: 20px;
+        width: 2px;
+        background-color: #56A0A9;
+      }
+      .tree-line-h {
+        height: 2px;
+        background-color: #56A0A9;
+        width: 100%;
+      }
+      .neuron-layer {
+        background-color: rgba(86, 160, 169, 0.1);
+        border-radius: 0.5rem;
+        padding: 1rem 0.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+        min-width: 60px;
+      }
+      .neuron {
+        background-color: #205A70;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+      }
+      nav a {
+        transition: color 0.2s ease-in-out;
+      }
+      nav a:hover {
+        color: #F9A03F;
+      }
+      .code-snippet {
+        background-color: #0B2D48;
+        color: #F8F8F8;
+        border-left: 4px solid #F9A03F;
+        padding: 0.75rem 1rem;
+        margin: 1rem 0;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9em;
+        overflow-x: auto;
+        border-radius: 0 0.25rem 0.25rem 0;
+        text-align: left;
+      }
+      .code-keyword { color: #F9A03F; }
+      .code-comment { color: #9a9a9a; font-style: italic; }
+      .code-string { color: #56A0A9; }
+      .code-function { color: #C2C2C2; }
+    </style>
+</head>
+<body class="bg-[#F8F8F8] text-[#0B2D48] leading-relaxed">
+
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto p-6 md:p-10 text-center">
+            <h1 class="text-3xl md:text-5xl font-bold text-[#205A70] mb-3">
+                A Practical Guide: ML in Healthcare with Python
+            </h1>
+            <p class="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto">
+                Implementing key machine learning models for healthcare using Scikit-learn.
+            </p>
+        </div>
+    </header>
+
+    <nav class="sticky top-0 bg-[#0B2D48] text-white p-4 shadow-lg z-10">
+        <div class="container mx-auto flex justify-center space-x-4 md:space-x-8 overflow-x-auto whitespace-nowrap">
+            <a href="#section1" class="font-medium px-2 py-1">Scikit-learn API</a>
+            <a href="#section2" class="font-medium px-2 py-1">Regression Models</a>
+            <a href="#section3" class="font-medium px-2 py-1">KNN</a>
+            <a href="#section4" class="font-medium px-2 py-1">Decision Trees</a>
+            <a href="#section5" class="font-medium px-2 py-1">Neural Networks</a>
+            <a href="#section6" class="font-medium px-2 py-1">Other Models</a>
+            <a href="#section7" class="font-medium px-2 py-1">ML Pipeline</a>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section id="section1" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">1. The Scikit-learn API</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                Scikit-learn provides a uniform "Estimator" API. Every algorithm is an object that learns from data. The core methods are `.fit()` and `.predict()`.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Supervised Learning: `fit(X, y)`</h3>
+                    <p class="text-gray-700 mb-4">Supervised models learn a mapping from features (X) to a target label (y). We train on labeled data and predict on new, unseen data.</p>
+                    <div class="code-snippet"><pre><code><span class="code-comment"># Supervised: X (features) and y (target)</span>
+<span class="code-keyword">from</span> sklearn.model_selection <span class="code-keyword">import</span> train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y)
+
+<span class="code-comment"># 'model' is any sklearn estimator</span>
+model.fit(X_train, y_train)
+predictions = model.predict(X_test)</code></pre></div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Unsupervised Learning: `fit(X)`</h3>
+                    <p class="text-gray-700 mb-4">Unsupervised models find structure in data without labels. We `fit` to the data, then use `.transform()` or `.predict()` to get the results.</p>
+                    <div class="code-snippet"><pre><code><span class="code-comment"># Unsupervised: Only X (features)</span>
+<span class="code-keyword">from</span> sklearn.preprocessing <span class="code-keyword">import</span> StandardScaler
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+<span class="code-comment"># 'model' is a clustering or transformer object</span>
+model.fit(X_scaled)
+clusters = model.predict(X_scaled)</code></pre></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section2" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">2. Core Parametric Models: Regression</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                These are the foundational models for predicting continuous values (like blood pressure) or binary outcomes (like disease risk).
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Linear Regression Code</h3>
+                    <p class="text-gray-700 mb-4">Used to predict a continuous value. The model learns a simple linear relationship from the features.</p>
+                    <div class="code-snippet"><pre><code><span class="code-keyword">from</span> sklearn.linear_model <span class="code-keyword">import</span> LinearRegression
+
+<span class="code-comment"># Predict Blood Pressure (y) from Age (X)</span>
+model = LinearRegression()
+model.fit(X_age, y_bp)
+
+<span class="code-comment"># Get the learned parameters</span>
+w1 = model.coef_      <span class="code-comment"># Slope (w₁)</span>
+w0 = model.intercept_ <span class="code-comment"># Intercept (w₀)</span></code></pre></div>
+                    <div class="chart-container">
+                        <canvas id="linearRegressionChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Logistic Regression Code</h3>
+                    <p class="text-gray-700 mb-4">Used for binary classification. It outputs the *probability* that a sample belongs to a class.</p>
+                    <div class="code-snippet"><pre><code><span class="code-keyword">from</span> sklearn.linear_model <span class="code-keyword">import</span> LogisticRegression
+
+<span class="code-comment"># Predict Diabetes (y) from Vitals (X)</span>
+model = LogisticRegression()
+model.fit(X_vitals, y_diabetes)
+
+<span class="code-comment"># Get probability for a new patient</span>
+prob = model.predict_proba(X_new_patient)</code></pre></div>
+                    <div class="chart-container">
+                        <canvas id="logisticRegressionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section3" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">3. Non-Parametric: K-Nearest Neighbors (KNN)</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                A simple and intuitive "instance-based" model. It classifies a new patient by finding the K most similar patients in the training data and taking a majority vote.
+            </p>
+            <div class="grid grid-cols-1 gap-8">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">KNN Classifier Code</h3>
+                    <p class="text-gray-700 mb-4">The `n_neighbors` parameter is the "K" you must choose. This model is sensitive to the scale of features, so scaling (e.g., `StandardScaler`) is almost always required.</p>
+                    <div class="code-snippet"><pre><code><span class="code-keyword">from</span> sklearn.neighbors <span class="code-keyword">import</span> KNeighborsClassifier
+<span class="code-keyword">from</span> sklearn.preprocessing <span class="code-keyword">import</span> StandardScaler
+
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_new_scaled = scaler.transform(X_new_patient)
+
+<span class="code-comment"># Model to find 5 nearest neighbors</span>
+model = KNeighborsClassifier(n_neighbors=5)
+model.fit(X_train_scaled, y_train)
+
+<span class="code-comment"># Classify a new patient</span>
+y_pred = model.predict(X_new_scaled)</code></pre></div>
+                    <div class="chart-container">
+                        <canvas id="knnChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section4" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">4. Interpretable Decisions: Trees and Forests</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                Powerful models that create a series of "if-then" rules, making them highly interpretable. Random Forests improve performance by averaging many trees.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Decision Tree Code</h3>
+                    <p class="text-gray-700 mb-4">We can control the tree's complexity by setting `max_depth` to prevent overfitting. The `criterion` can be 'gini' or 'entropy'.</p>
+                    <div class="code-snippet"><pre><code><span class="code-keyword">from</span> sklearn.tree <span class="code-keyword">import</span> DecisionTreeClassifier
+
+<span class="code-comment"># Build a tree with Gini impurity, max depth 3</span>
+model = DecisionTreeClassifier(
+    criterion=<span class="code-string">'gini'</span>,
+    max_depth=3
+)
+model.fit(X_symptoms, y_triage)</code></pre></div>
+                    <div class="flex flex-col items-center text-center mt-6">
+                        <div class="tree-node">Chest Pain? (Gini = 0.48)</div>
+                        <div class="flex w-full mt-2">
+                            <div class="w-1/2 text-sm text-gray-600 pr-4 text-right">Yes</div>
+                            <div class="w-1/2 text-sm text-gray-600 pl-4 text-left">No</div>
+                        </div>
+                        <div class="flex w-full">
+                            <div class="tree-branch w-1/2">
+                                <div class="tree-line"></div>
+                                <div class="font-medium text-sm text-[#205A70]">Yes</div>
+                                <div class="tree-line"></div>
+                                <div class="tree-node bg-[#205A70] text-white">Triage: High (Gini = 0.0)</div>
+                            </div>
+                            <div class="tree-branch w-1/2">
+                                <div class="tree-line"></div>
+                                <div class="font-medium text-sm text-gray-600">No</div>
+                                <div class="tree-line"></div>
+                                <div class="tree-node">Fever > 101°F? (Gini = 0.32)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Random Forest Code</h3>
+                    <p class="text-gray-700 mb-4">An "ensemble" model that builds many trees (`n_estimators`) on random subsets of data and features, then averages their votes.</p>
+                    <div class="code-snippet"><pre><code><span class="code-keyword">from</span> sklearn.ensemble <span class="code-keyword">import</span> RandomForestClassifier
+
+<span class="code-comment"># Build a forest of 100 trees</span>
+model = RandomForestClassifier(
+    n_estimators=100,
+    max_features=<span class="code-string">'sqrt'</span>, <span class="code-comment"># Use random subset of features</span>
+    random_state=42
+)
+model.fit(X_train, y_train)</code></pre></div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="section5" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">5. Introduction to Neural Networks</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                Scikit-learn implements a simple Multi-Layer Perceptron (MLP). For more complex tasks like image analysis, dedicated libraries are used.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">MLPClassifier Code</h3>
+                    <p class="text-gray-700 mb-4">This builds a "feedforward" neural network. We define the `hidden_layer_sizes` (e.g., 2 layers with 100 and 50 neurons).</p>
+                    <div class="code-snippet"><pre><code><span class="code-keyword">from</span> sklearn.neural_network <span class="code-keyword">import</span> MLPClassifier
+
+<span class="code-comment"># A 2-layer network (100, 50 neurons)</span>
+model = MLPClassifier(
+    hidden_layer_sizes=(100, 50),
+    activation=<span class="code-string">'relu'</span>,
+    solver=<span class="code-string">'adam'</span>,
+    max_iter=500,
+    random_state=42
+)
+model.fit(X_train_scaled, y_train)</code></pre></div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Beyond Scikit-learn: Deep Learning</h3>
+                    <p class="text-gray-700 mb-4">For specialized tasks like analyzing medical images (X-rays, MRIs) or clinical notes, the ecosystem shifts to more powerful libraries:</p>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                        <li><strong>TensorFlow (with Keras):</strong> A comprehensive deep learning platform developed by Google.</li>
+                        <li><strong>PyTorch:</strong> A flexible framework popular in research, developed by Meta.</li>
+                    </ul>
+                    <div class="chart-container" style="height: 300px;">
+                        <canvas id="dlArchitecturesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section6" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">6. Beyond the Basics: Other Powerful Models</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                These models are workhorses for clustering (finding patient groups) and complex classification (finding non-linear patterns).
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">K-Means Clustering Code</h3>
+                    <p class="text-gray-700 mb-4">An unsupervised model to find K distinct groups in data. We must specify `n_clusters` (K) in advance.</p>
+                    <div class="code-snippet"><pre><code><span class="code-keyword">from</span> sklearn.cluster <span class="code-keyword">import</span> KMeans
+
+<span class="code-comment"># Find 3 patient clusters</span>
+model = KMeans(
+    n_clusters=3,
+    n_init=10, <span class="code-comment"># Run 10 times, pick best result</span>
+    random_state=42
+)
+model.fit(X_scaled)
+
+<span class="code-comment"># Get cluster assignments and centroids</span>
+labels = model.labels_
+centers = model.cluster_centers_</code></pre></div>
+                    <div class="chart-container">
+                        <canvas id="kmeansChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Support Vector Machine (SVM) Code</h3>
+                    <p class="text-gray-700 mb-4">A powerful classifier that finds the "best" boundary between classes. The `kernel` trick lets it find complex, non-linear boundaries.</p>
+                    <div class="code-snippet"><pre><code><span class="code-keyword">from</span> sklearn.svm <span class="code-keyword">import</span> SVC
+
+<span class="code-comment"># Use a non-linear RBF kernel</span>
+model = SVC(
+    kernel=<span class="code-string">'rbf'</span>,
+    C=1.0,           <span class="code-comment"># Regularization parameter</span>
+    probability=True <span class="code-comment"># To use predict_proba</span>
+)
+model.fit(X_train_scaled, y_train)</code></pre></div>
+                    <div class="chart-container">
+                        <canvas id="svmChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section7" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">7. The General ML Development Pipeline</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                Building a robust ML model for healthcare isn't just about calling `.fit()`. It's a cyclical process that involves several critical stages, from data collection to real-world monitoring.
+            </p>
+            <div class="grid grid-cols-1 gap-8">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex flex-col items-center w-full max-w-2xl mx-auto">
+                        
+                        <div class="flow-box w-full md:w-3/4 text-center p-4 rounded-lg">
+                            <h4 class="font-semibold text-lg">1. Data Collection & Integration</h4>
+                            <p class="text-sm text-gray-700">Gather data: EHRs, Lab Results, Imaging Data, Vitals</p>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        
+                        <div class="flow-box w-full md:w-3/4 text-center p-4 rounded-lg">
+                            <h4 class="font-semibold text-lg">2. Data Preprocessing & Feature Engineering</h4>
+                            <p class="text-sm text-gray-700">Handle missing values, scale numerics, one-hot encode categoricals</p>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+
+                        <div class="flow-box w-full md:w-3/4 text-center p-4 rounded-lg">
+                            <h4 class="font-semibold text-lg">3. Train/Validation/Test Split</h4>
+                            <p class="text-sm text-gray-700">Use <code>train_test_split</code> to create separate datasets to prevent overfitting</p>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+
+                        <div class="flow-box w-full md:w-3/4 text-center p-4 rounded-lg">
+                            <h4 class="font-semibold text-lg">4. Model Training</h4>
+                            <p class="text-sm text-gray-700">Train various models: <code>model.fit(X_train, y_train)</code></p>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+
+                        <div class="flow-box w-full md:w-3/4 text-center p-4 rounded-lg">
+                            <h4 class="font-semibold text-lg">5. Model Evaluation</h4>
+                            <p class="text-sm text-gray-700">Use <code>accuracy_score</code>, <code>roc_auc_score</code>, etc., on <code>X_test</code></p>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+
+                        <div class="flow-box w-full md:w-3/4 text-center p-4 rounded-lg">
+                            <h4 class="font-semibold text-lg">6. Deployment & Monitoring</h4>
+                            <p class="text-sm text-gray-700">Integrate into clinical workflow and monitor for data drift</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center p-8 text-gray-600 bg-[#F8F8F8] border-t border-gray-200">
+        <p>Department of Bio-Medical Sciences, Apollo University, Chittoor</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const colorPrimary = '#205A70';
+            const colorSecondary = '#56A0A9';
+            const colorAccent = '#F9A03F';
+            const colorLight = '#C2C2C2';
+            const colorBg = 'rgba(86, 160, 169, 0.1)';
+            const colorRiskHigh = '#F9A03F';
+            const colorRiskLow = '#205A70';
+            const colorUnknown = '#FBC17D';
+
+            const tooltipTitleCallback = (tooltipItems) => {
+              const item = tooltipItems[0];
+              let label = item.chart.data.labels[item.dataIndex];
+              if (Array.isArray(label)) {
+                return label.join(' ');
+              } else {
+                return label;
+              }
+            };
+            
+            const defaultChartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: tooltipTitleCallback
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false }
+                    },
+                    y: {
+                        grid: { color: '#eee' }
+                    }
+                }
+            };
+
+            const processLabels = (labels, maxWidth = 16) => {
+                return labels.map(label => {
+                    if (label.length <= maxWidth) return label;
+                    let lines = [];
+                    let currentLine = '';
+                    const words = label.split(' ');
+                    for (const word of words) {
+                        if ((currentLine + ' ' + word).trim().length > maxWidth) {
+                            lines.push(currentLine.trim());
+                            currentLine = word;
+                        } else {
+                            currentLine = (currentLine + ' ' + word).trim();
+                        }
+                    }
+                    if (currentLine) lines.push(currentLine.trim());
+                    return lines;
+                });
+            };
+
+            if (document.getElementById('linearRegressionChart')) {
+                const ctxLinear = document.getElementById('linearRegressionChart').getContext('2d');
+                const ageVsBpData = [
+                    {x: 40, y: 120}, {x: 45, y: 122}, {x: 50, y: 128}, {x: 55, y: 130},
+                    {x: 60, y: 135}, {x: 65, y: 138}, {x: 70, y: 142}, {x: 75, y: 144}
+                ];
+                new Chart(ctxLinear, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Patient Data (Age, BP)',
+                                data: ageVsBpData,
+                                backgroundColor: colorSecondary,
+                                type: 'scatter'
+                            },
+                            {
+                                label: 'OLS Regression Line',
+                                data: [{x: 40, y: 118}, {x: 75, y: 145}],
+                                type: 'line',
+                                fill: false,
+                                borderColor: colorAccent,
+                                borderWidth: 3
+                            }
+                        ]
+                    },
+                    options: {
+                        ...defaultChartOptions,
+                        scales: {
+                            x: { title: { display: true, text: 'Age' }, grid: { display: false } },
+                            y: { title: { display: true, text: 'Systolic Blood Pressure' }, grid: { color: '#eee' } }
+                        }
+                    }
+                });
+            }
+
+            if (document.getElementById('logisticRegressionChart')) {
+                const ctxLogistic = document.getElementById('logisticRegressionChart').getContext('2d');
+                const logisticCurve = Array.from({length: 100}, (_, i) => {
+                    const x = (i - 50) / 10;
+                    const y = 1 / (1 + Math.exp(-x));
+                    return {x: x, y: y};
+                });
+                const logisticData = [
+                    {x: -5, y: 0.05}, {x: -4, y: 0.1}, {x: -3, y: 0.15}, {x: -2, y: 0.3}, {x: -1, y: 0.4},
+                    {x: 1, y: 0.6}, {x: 2, y: 0.7}, {x: 3, y: 0.85}, {x: 4, y: 0.9}, {x: 5, y: 0.95}
+                ];
+                
+                new Chart(ctxLogistic, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Patient Data (0 or 1)',
+                                data: logisticData,
+                                backgroundColor: colorSecondary
+                            },
+                            {
+                                label: 'Logistic Function σ(z)',
+                                data: logisticCurve,
+                                type: 'line',
+                                fill: false,
+                                borderColor: colorAccent,
+                                borderWidth: 3,
+                                pointRadius: 0
+                            }
+                        ]
+                    },
+                    options: {
+                        ...defaultChartOptions,
+                        scales: {
+                            x: { title: { display: true, text: 'Linear Score (z = wᵀx)' }, grid: { display: false } },
+                            y: { title: { display: true, text: 'Probability P(y=1)' }, min: 0, max: 1, grid: { color: '#eee' } }
+                        }
+                    }
+                });
+            }
+
+            if (document.getElementById('knnChart')) {
+                const ctxKnn = document.getElementById('knnChart').getContext('2d');
+                const classA = [{x: 2, y: 3}, {x: 3, y: 4}, {x: 4, y: 2}, {x: 2.5, y: 2}, {x: 3.5, y: 3}];
+                const classB = [{x: 7, y: 8}, {x: 8, y: 9}, {x: 9, y: 7}, {x: 7.5, y: 7}, {x: 8.5, y: 8}];
+                const unknown = [{x: 5, y: 6}];
+                
+                new Chart(ctxKnn, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Class A (Healthy)',
+                                data: classA,
+                                backgroundColor: colorSecondary,
+                                pointRadius: 6
+                            },
+                            {
+                                label: 'Class B (Disease)',
+                                data: classB,
+                                backgroundColor: colorPrimary,
+                                pointRadius: 6
+                            },
+                            {
+                                label: 'Unknown Patient (x_new)',
+                                data: unknown,
+                                backgroundColor: colorUnknown,
+                                pointRadius: 8,
+                                pointStyle: 'rectRot',
+                                borderWidth: 2,
+                                borderColor: colorAccent
+                            }
+                        ]
+                    },
+                    options: {
+                        ...defaultChartOptions,
+                        scales: {
+                            x: { title: { display: true, text: 'Biomarker 1' }, grid: { display: false } },
+                            y: { title: { display: true, text: 'Biomarker 2' }, grid: { color: '#eee' } }
+                        }
+                    }
+                });
+            }
+
+            if (document.getElementById('dlArchitecturesChart')) {
+                const ctxDL = document.getElementById('dlArchitecturesChart').getContext('2d');
+                const labels = processLabels(['CNNs (TensorFlow/Keras)', 'RNNs (PyTorch)', 'Transformers (HuggingFace)']);
+                new Chart(ctxDL, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Problem-Fit for Task',
+                            data: [95, 80, 90],
+                            backgroundColor: [
+                                colorPrimary,
+                                colorAccent,
+                                colorSecondary
+                            ],
+                            borderColor: colorPrimary,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        ...defaultChartOptions,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: tooltipTitleCallback
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: { display: true, text: 'Problem-Fit Score (out of 100)' },
+                                grid: { color: '#eee' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (document.getElementById('kmeansChart')) {
+                const ctxKmeans = document.getElementById('kmeansChart').getContext('2d');
+                new Chart(ctxKmeans, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Cluster 1',
+                                data: [{x: 2, y: 3}, {x: 2.5, y: 3.5}, {x: 1.5, y: 2.5}, {x: 3, y: 2}],
+                                backgroundColor: colorPrimary,
+                                pointRadius: 6
+                            },
+                            {
+                                label: 'Cluster 2',
+                                data: [{x: 7, y: 8}, {x: 7.5, y: 8.5}, {x: 6.5, y: 7.5}, {x: 8, y: 7}],
+                                backgroundColor: colorSecondary,
+                                pointRadius: 6
+                            },
+                            {
+                                label: 'Cluster 3 (Centroid μ₃)',
+                                data: [{x: 2.5, y: 8.125}],
+                                backgroundColor: colorAccent,
+                                pointRadius: 10,
+                                pointStyle: 'crossRot',
+                                borderWidth: 3,
+                                borderColor: colorAccent
+                            },
+                            {
+                                label: 'Cluster 3 Points',
+                                data: [{x: 2, y: 8}, {x: 3.5, y: 8.5}, {x: 1.5, y: 7.5}, {x: 3, y: 9}],
+                                backgroundColor: 'rgba(249, 160, 63, 0.5)',
+                                pointRadius: 6
+                            }
+                        ]
+                    },
+                    options: {
+                        ...defaultChartOptions,
+                        plugins: {
+                            tooltip: { callbacks: { title: tooltipTitleCallback }},
+                            legend: {
+                                labels: {
+                                    filter: item => item.text && !item.text.includes('Points')
+                                }
+                            }
+                        },
+                        scales: {
+                            x: { 
+                                title: { display: true, text: 'Biomarker A' },
+                                grid: { display: false }
+                            },
+                            y: { 
+                                title: { display: true, text: 'Biomarker B' },
+                                grid: { color: '#eee' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (document.getElementById('svmChart')) {
+                const ctxSvm = document.getElementById('svmChart').getContext('2d');
+                new Chart(ctxSvm, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Class 1 (y = +1)',
+                                data: [{x: 2, y: 3}, {x: 2.5, y: 4.5}, {x: 1.5, y: 2.5}, {x: 3, y: 2}, {x: 4, y: 5}],
+                                backgroundColor: colorPrimary,
+                                type: 'scatter'
+                            },
+                            {
+                                label: 'Class 2 (y = -1)',
+                                data: [{x: 7, y: 8}, {x: 7.5, y: 9.5}, {x: 6.5, y: 7.5}, {x: 8, y: 7}, {x: 6, y: 8.5}],
+                                backgroundColor: colorSecondary,
+                                type: 'scatter'
+                            },
+                            {
+                                label: 'Non-Linear Boundary (RBF)',
+                                data: [{x: 0, y: 6.5}, {x: 10, y: 4.5}],
+                                backgroundColor: colorAccent,
+                                borderColor: colorAccent,
+                                type: 'line',
+                                fill: false,
+                                borderWidth: 3,
+                                pointRadius: 0,
+                                tension: 0.4
+                            },
+                        ]
+                    },
+                    options: {
+                        ...defaultChartOptions,
+                        plugins: {
+                            tooltip: { callbacks: { title: tooltipTitleCallback }},
+                            legend: {
+                                labels: {
+                                    filter: item => item.text && !item.text.includes('Gutters')
+                                }
+                            }
+                        },
+                        scales: {
+                            x: { 
+                                title: { display: true, text: 'Tumor Radius' },
+                                grid: { display: false }
+                            },
+                            y: { 
+                                title: { display: true, text: 'Tumor Texture' },
+                                grid: { color: '#eee' }
+                            }
+                        }
+                    }
+                });
+            }
+
+        });
+    </script>
+</body>
+</html>
+
+
