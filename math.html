@@ -7,9 +7,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" xintegrity="sha384-wcIxkf4k558dRKaPBOOTcvgtSYpolSSgGcVpLGYA/ElPj+yBI+wNriSjE+hYsFzN" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" xintegrity="sha384-hIoBPnHW1vjMhA34A6zFhM/A1GcnSkA0zH/rKW3bV0PHhDkMhNl/NzSjMshC3/G1" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" xintegrity="sha384-43gviGvBIs1ce2SwnwqTKQQeGzVwGfVvBrmoP4GtcJ/sWnI1GMusXIcvkLKSKnDk" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
     <style>
       body {
         font-family: 'Inter', sans-serif;
@@ -81,14 +81,22 @@
         color: #F9A03F;
       }
       .math-formula {
-        padding: 0.75rem 0;
-        margin: 1rem 0;
-        font-size: 1.1em;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 1em 0;
+        margin: 1em 0;
+        font-size: 1.15em;
         overflow-x: auto;
+        width: 100%;
         text-align: center;
+        min-height: 2.5em;
       }
       .katex-display {
-        margin: 0.5em 0;
+        margin: 0 auto !important;
+        width: max-content;
+        display: block !important;
+        text-align: center;
       }
       .math-inline {
         font-size: 1.05em;
@@ -122,114 +130,123 @@
 
     <main class="container mx-auto p-4 md:p-8">
 
+        <!-- Section 1: Formal Introduction -->
         <section id="section1" class="mb-12 pt-16 -mt-16">
             <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">1. A Formal Introduction to Learning</h2>
             <p class="text-lg mb-8 text-gray-700">
-                At its core, machine learning seeks to find a function <span class="math-inline">\(f\)</span> that maps inputs <span class="math-inline">\(\mathbf{x}\)</span> (patient features) to outputs <span class="math-inline">\(y\)</span> (diagnosis, risk score). This function is "learned" by minimizing a <strong>loss function</strong> over a dataset <span class="math-inline">\(D\)</span>.
+                At its core, machine learning seeks to find a function <span class="math-inline">\(f\)</span> that maps inputs <span class="math-inline">\(\mathbf{x}\)</span> (patient features) to outputs <span class="math-inline">\(y\)</span> (diagnoses, predictions).
             </p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Supervised Learning (Task-Driven)</h3>
-                    <p class="text-gray-700 mb-4">Given a labeled dataset <span class="math-inline">\(D = \{(\mathbf{x}_i, y_i)\}_{i=1}^{N}\)</span>, the goal is to find a function <span class="math-inline">\(f\)</span> that minimizes the <strong>Empirical Risk</strong> (average loss):</p>
+                    <p class="text-gray-700 mb-4">Given a labeled dataset <span class="math-inline">\(D = \{(\mathbf{x}_i, y_i)\}_{i=1}^{N}\)</span>, the goal is to find a function <span class="math-inline">\(f\)</span> minimizing expected loss:</p>
                     <div class="math-formula">
                         $$R(f) = \frac{1}{N} \sum_{i=1}^{N} L(f(\mathbf{x}_i), y_i)$$
                     </div>
-                    <p class="text-gray-700 mt-4">Where <span class="math-inline">\(L\)</span> is a <strong>loss function</strong> (e.g., Mean Squared Error for regression, Cross-Entropy for classification) that measures the penalty for an incorrect prediction.</p>
+                    <p class="text-gray-700 mt-4">Where <span class="math-inline">\(L\)</span> is a <strong>loss function</strong> (e.g., Mean Squared Error, Cross-Entropy).</p>
                 </div>
-                
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Unsupervised Learning (Data-Driven)</h3>
-                    <p class="text-gray-700 mb-4">Given an unlabeled dataset <span class="math-inline">\(D = \{\mathbf{x}_i\}_{i=1}^{N}\)</span>, the goal is to find hidden structure. This is not optimized against a single loss function, but rather objectives like:</p>
+                    <p class="text-gray-700 mb-4">Given an unlabeled dataset <span class="math-inline">\(D = \{\mathbf{x}_i\}_{i=1}^{N}\)</span>, the goal is to find hidden structure.</p>
                     <ul class="list-disc list-inside text-gray-700 space-y-2">
                         <li><strong>Clustering:</strong> Grouping data into <span class="math-inline">\(k\)</span> clusters to minimize within-cluster variance.</li>
-                        <li><strong>Dimensionality Reduction:</strong> Projecting data <span class="math-inline">\(\mathbf{x}\)</span> into a lower-dimensional space <span class="math-inline">\(\mathbf{z}\)</span> while preserving as much variance as possible.</li>
+                        <li><strong>Dimensionality Reduction:</strong> Projecting <span class="math-inline">\(\mathbf{x}\)</span> to lower-dimensional space <span class="math-inline">\(\mathbf{z}\)</span>.</li>
                     </ul>
                 </div>
             </div>
         </section>
 
+        <!-- Section 2: Regression Models -->
         <section id="section2" class="mb-12 pt-16 -mt-16">
             <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">2. Core Parametric Models: Regression</h2>
             <p class="text-lg mb-8 text-gray-700">
-                Regression models are parametric, meaning they define a fixed-form function <span class="math-inline">\(f(\mathbf{x}, \mathbf{w})\)</span> with parameters (or weights) <span class="math-inline">\(\mathbf{w}\)</span> that are learned from the data.
+                Regression models are parametric, meaning they define a fixed-form function <span class="math-inline">\(f(\mathbf{x}, \mathbf{w})\)</span> with parameters (weights) <span class="math-inline">\(\mathbf{w}\)</span>.
             </p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Linear Regression: The Model</h3>
-                    <p class="text-gray-700 mb-4">Assumes a linear relationship. The prediction <span class="math-inline">\(\hat{y}\)</span> ("y-hat") is a weighted sum of input features <span class="math-inline">\(\mathbf{x}\)</span>:</p>
-                    <div class="math-formula">$$\hat{y} = w_0 + w_1x_1 + \dots + w_nx_n = \mathbf{w}^T\mathbf{x}$$</div>
-                    <p class="text-gray-700 mb-4">Weights <span class="math-inline">\(\mathbf{w}\)</span> are found by minimizing the <strong>Mean Squared Error (MSE)</strong>, typically via Gradient Descent or the analytical <strong>Normal Equation</strong>.</p>
-                    <div class="math-formula">$$L(\mathbf{w}) = \frac{1}{N} \sum_{i=1}^{N} (y_i - \mathbf{w}^T\mathbf{x}_i)^2$$</div>
+                    <p class="text-gray-700 mb-4">Assumes a linear relationship. Prediction <span class="math-inline">\(\hat{y}\)</span> is a weighted sum:</p>
+                    <div class="math-formula">
+                        $$\hat{y} = w_0 + w_1x_1 + \dots + w_nx_n = \mathbf{w}^T\mathbf{x}$$
+                    </div>
+                    <p class="text-gray-700 mb-4">Weights <span class="math-inline">\(\mathbf{w}\)</span> found by minimizing <strong>MSE</strong>:</p>
+                    <div class="math-formula">
+                        $$L(\mathbf{w}) = \frac{1}{N} \sum_{i=1}^{N} (y_i - \mathbf{w}^T\mathbf{x}_i)^2$$
+                    </div>
                     <div class="chart-container">
                         <canvas id="linearRegressionChart"></canvas>
                     </div>
                     <p class="mt-6 text-gray-600 text-sm italic text-center">
-                        This chart visualizes the <strong>Ordinary Least Squares (OLS)</strong> best-fit line that minimizes the sum of squared residuals (vertical distances) for the data.
+                        This chart visualizes the Ordinary Least Squares (OLS) best-fit line for the data.
                     </p>
                 </div>
-
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Logistic Regression: The Model</h3>
-                    <p class="text-gray-700 mb-4">Adapts linear regression for binary (0/1) classification. It maps the linear output <span class="math-inline">\(z = \mathbf{w}^T\mathbf{x}\)</span> to a probability using the <strong>sigmoid function</strong> (<span class="math-inline">\(\sigma\)</span>):</p>
-                    <div class="math-formula">$$P(y=1 | \mathbf{x}) = \hat{y} = \sigma(\mathbf{w}^T\mathbf{x}) = \frac{1}{1 + e^{-\mathbf{w}^T\mathbf{x}}}$$</div>
-                    <p class="text-gray-700 mb-4">It's trained by minimizing the <strong>Binary Cross-Entropy (Log Loss)</strong>, as MSE is non-convex for this problem.</p>
-                    <div class="math-formula">$$L(\mathbf{w}) = -\frac{1}{N} \sum_{i=1}^{N} [y_i \log(\hat{y}_i) + (1-y_i) \log(1-\hat{y}_i)]$$</div>
+                    <p class="text-gray-700 mb-4">For binary classification, maps output <span class="math-inline">\(z = \mathbf{w}^T\mathbf{x}\)</span> to probability:</p>
+                    <div class="math-formula">
+                        $$P(y=1 | \mathbf{x}) = \hat{y} = \sigma(\mathbf{w}^T\mathbf{x}) = \frac{1}{1 + e^{-\mathbf{w}^T\mathbf{x}}}$$
+                    </div>
+                    <p class="text-gray-700 mb-4">Trained by minimizing <strong>Binary Cross-Entropy</strong>:</p>
+                    <div class="math-formula">
+                        $$L(\mathbf{w}) = -\frac{1}{N} \sum_{i=1}^{N} [y_i \log(\hat{y}_i) + (1-y_i) \log(1-\hat{y}_i)]$$
+                    </div>
                     <div class="chart-container">
                         <canvas id="logisticRegressionChart"></canvas>
                     </div>
-                     <p class="mt-6 text-gray-600 text-sm italic text-center">
-                        The logistic S-curve maps any real-valued linear output to a probability between 0 and 1, allowing for a decision boundary (e.g., at P=0.5).
+                    <p class="mt-6 text-gray-600 text-sm italic text-center">
+                        The logistic S-curve maps any linear output to probability between 0 and 1.
                     </p>
                 </div>
             </div>
         </section>
 
+        <!-- Section 3: KNN -->
         <section id="section3" class="mb-12 pt-16 -mt-16">
             <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">3. Non-Parametric: K-Nearest Neighbors (KNN)</h2>
             <p class="text-lg mb-8 text-gray-700">
-                KNN is an "instance-based" or "lazy" learning algorithm. It makes no assumptions about the underlying data distribution (non-parametric) and simply stores the entire training set.
+                KNN is an "instance-based" or "lazy" learning algorithm. It stores the training set and makes predictions based on proximity.
             </p>
             <div class="grid grid-cols-1 gap-8">
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-xl font-semibold mb-4 text-[#205A70]">The KNN Algorithm</h3>
-                    <p class="text-gray-700 mb-4">To classify a new point <span class="math-inline">\(\mathbf{x}_{\text{new}}\)</span>:</p>
+                    <p class="text-gray-700 mb-4">Classify a new point <span class="math-inline">\(\mathbf{x}_{\text{new}}\)</span>:</p>
                     <ol class="list-decimal list-inside text-gray-700 space-y-2 mb-4">
-                        <li>Choose a value for <span class="math-inline">\(K\)</span> (e.g., K=5) and a <strong>distance metric</strong>.</li>
-                        <li>A common metric is <strong>Euclidean Distance</strong>:
+                        <li>Choose <span class="math-inline">\(K\)</span> and a <strong>distance metric</strong>.</li>
+                        <li>Common metric: <strong>Euclidean Distance</strong>:
                             <div class="math-formula">$$d(\mathbf{p}, \mathbf{q}) = \sqrt{ \sum_{i=1}^{n} (p_i - q_i)^2 }$$</div>
                         </li>
-                        <li>Find the <span class="math-inline">\(K\)</span> training samples (<span class="math-inline">\(\mathbf{x}_1, \dots, \mathbf{x}_K\)</span>) closest to <span class="math-inline">\(\mathbf{x}_{\text{new}}\)</span>.</li>
-                        <li><strong>Classification:</strong> Predict <span class="math-inline">\(\hat{y}_{\text{new}}\)</span> as the <strong>majority class</strong> of the K neighbors.</li>
-                        <li><strong>Regression:</strong> Predict <span class="math-inline">\(\hat{y}_{\text{new}}\)</span> as the <strong>average value</strong> of the K neighbors.</li>
+                        <li>Find the <span class="math-inline">\(K\)</span> nearest training samples.</li>
+                        <li><strong>Classification:</strong> Predict as majority class of neighbors.</li>
+                        <li><strong>Regression:</strong> Predict as average value of neighbors.</li>
                     </ol>
                     <div class="chart-container">
                         <canvas id="knnChart"></canvas>
                     </div>
                     <p class="mt-6 text-gray-600 text-sm italic text-center">
-                        Here, with K=5, the 5 nearest neighbors to the new point (orange) are found. The majority class (3 'Disease' vs. 2 'Healthy') determines its prediction.
+                        With K=5, the majority class among 5 nearest neighbors determines prediction.
                     </p>
                 </div>
             </div>
         </section>
 
+        <!-- Section 4: Trees and Forests -->
         <section id="section4" class="mb-12 pt-16 -mt-16">
             <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">4. Interpretable Decisions: Trees and Forests</h2>
             <p class="text-lg mb-8 text-gray-700">
-                Decision Trees are non-parametric models that learn a hierarchy of "if-then" rules. Random Forests improve their stability by averaging many trees.
+                Decision Trees learn a hierarchy of "if-then" rules. Random Forests average many trees for stability.
             </p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Building a Decision Tree (CART)</h3>
-                    <p class="text-gray-700 mb-4">Trees are built by recursively finding the "best" split (feature <span class="math-inline">\(j\)</span> and threshold <span class="math-inline">\(t\)</span>) that maximizes <strong>Information Gain</strong>. This is equivalent to minimizing the weighted impurity of the child nodes.</p>
-                    <p class="text-gray-700 mb-4">Common impurity measures for a node with class proportions <span class="math-inline">\(p\)</span>:</p>
+                    <p class="text-gray-700 mb-4">Trees are built by recursively finding "best" feature splits.</p>
+                    <p class="text-gray-700 mb-4">Common impurity measures for node with class proportions <span class="math-inline">\(p\)</span>:</p>
                     <ul class="list-disc list-inside text-gray-700 space-y-2">
                         <li><strong>Gini Impurity:</strong> <span class="math-inline">\(G(p) = 1 - \sum_{k} p_k^2\)</span></li>
                         <li><strong>Entropy:</strong> <span class="math-inline">\(H(p) = - \sum_{k} p_k \log_2(p_k)\)</span></li>
                     </ul>
-                    <div class="math-formula">$$\text{Gain} = \text{Impurity}(\text{parent}) - [w_L \cdot \text{Impurity}(L) + w_R \cdot \text{Impurity}(R)]$$</div>
+                    <div class="math-formula">
+                        $$\text{Gain} = \text{Impurity}(\text{parent}) - [w_L \cdot \text{Impurity}(L) + w_R \cdot \text{Impurity}(R)]$$
+                    </div>
                     <div class="flex flex-col items-center text-center mt-6">
                         <div class="tree-node">Chest Pain? <span class="math-inline">\((Gini = 0.48)\)</span></div>
                         <div class="flex w-full mt-2">
@@ -247,49 +264,48 @@
                                 <div class="tree-line"></div>
                                 <div class="font-medium text-sm text-gray-600">No</div>
                                 <div class="tree-line"></div>
-                                <div class="tree-node">Fever > 101°F? <span class="math-inline">\((Gini = 0.32)\)</span></div>
+                                <div class="tree-node">Fever &gt; 101°F? <span class="math-inline">\((Gini = 0.32)\)</span></div>
                             </div>
                         </div>
                     </div>
                 </div>
-
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Ensemble: Random Forest</h3>
-                    <p class="text-gray-700 mb-4">A single tree has high variance. A Random Forest is an <strong>ensemble</strong> of <span class="math-inline">\(B\)</span> decorrelated trees. It uses two key techniques:</p>
+                    <p class="text-gray-700 mb-4">A Random Forest is an <strong>ensemble</strong> of <span class="math-inline">\(B\)</span> decorrelated trees:</p>
                     <ol class="list-decimal list-inside text-gray-700 space-y-2 mb-4">
-                        <li><strong>Bagging (Bootstrap Aggregating):</strong> Each tree <span class="math-inline">\(f_s\)</span> is trained on a different bootstrap sample (a random sample of data *with replacement*).</li>
-                        <li><strong>Feature Randomness:</strong> At each split, only a random subset of <span class="math-inline">\(m\)</span> features (where <span class="math-inline">\(m < \text{total features}\)</span>) is considered.</li>
+                        <li><strong>Bagging:</strong> Each tree <span class="math-inline">\(f_s\)</span> trained on a bootstrap sample.</li>
+                        <li><strong>Feature Randomness:</strong> At each split, only a random subset of <span class="math-inline">\(m\)</span> features is considered.</li>
                     </ol>
-                    <p class="text-gray-700 mb-4">The final prediction is the <strong>majority vote</strong> (for classification) or <strong>average</strong> (for regression) of all B trees.</p>
-                    <div class="math-formula">$$\hat{y}_{\text{rf}} = \text{majority\_vote}( \{ f_s(\mathbf{x}) \}_{s=1}^{B} )$$</div>
+                    <p class="text-gray-700 mb-4">Final prediction: <strong>majority vote</strong> or <strong>average</strong> of all B trees.</p>
+                    <div class="math-formula">
+                        $$\hat{y}_{\text{rf}} = \text{majority\_vote}( \{ f_s(\mathbf{x}) \}_{s=1}^{B} )$$
+                    </div>
                 </div>
-
             </div>
         </section>
 
+        <!-- Section 5: Neural Networks -->
         <section id="section5" class="mb-12 pt-16 -mt-16">
             <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">5. Introduction to Neural Networks</h2>
             <p class="text-lg mb-8 text-gray-700">
-                Deep Learning models (Neural Networks) are powerful function approximators composed of layers of "neurons."
+                Deep Learning models are composed of layers of "neurons"—powerful function approximators.
             </p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-xl font-semibold mb-4 text-[#205A70]">The Feedforward Neuron</h3>
-                    <p class="text-gray-700 mb-4">A single neuron computes a weighted sum of its inputs, adds a bias <span class="math-inline">\(b\)</span>, and passes the result through a non-linear <strong>activation function <span class="math-inline">\(g(z)\)</span></strong> (like ReLU or sigmoid).</p>
+                    <p class="text-gray-700 mb-4">A neuron computes weighted sum, adds bias <span class="math-inline">\(b\)</span>, passes through non-linearity <span class="math-inline">\(g\)</span>:</p>
                     <div class="math-formula">$$a = g(\mathbf{w}^T\mathbf{x} + b)$$</div>
-                    <p class="text-gray-700 mb-4">A full layer <span class="math-inline">\(l\)</span> is a vector of these operations, computing <span class="math-inline">\(\mathbf{a}^{(l)}\)</span> from the previous layer's activations <span class="math-inline">\(\mathbf{a}^{(l-1)}\)</span>:</p>
+                    <p class="text-gray-700 mb-4">A layer <span class="math-inline">\(l\)</span> stacks neurons:</p>
                     <div class="math-formula">$$\mathbf{a}^{(l)} = g( \mathbf{W}^{(l)}\mathbf{a}^{(l-1)} + \mathbf{b}^{(l)} )$$</div>
-                    <p class="text-gray-700 mb-4">The entire network is trained using <strong>Backpropagation</strong> (an application of the chain rule) to compute the gradient of the loss function w.r.t. all weights <span class="math-inline">\(\mathbf{W}\)</span> and biases <span class="math-inline">\(\mathbf{b}\)</span>.</p>
+                    <p class="text-gray-700 mb-4">Network trained using <strong>Backpropagation</strong> (chain rule on loss gradient).</p>
                 </div>
-
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Key Deep Learning Architectures</h3>
-                    <p class="text-gray-700 mb-4">Different architectures are specialized for different data types:</p>
+                    <p class="text-gray-700 mb-4">Specialized architectures:</p>
                     <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
-                        <li><strong>Convolutional NN (CNN):</strong> Uses "convolution" filters to learn spatial hierarchies. Dominant in medical image analysis.</li>
-                        <li><strong>Recurrent NN (RNN/LSTM):</strong> Models sequential data by maintaining a hidden state. Used for time-series (EHR data, vitals).</li>
-                        <li><strong>Transformers:</strong> Use a "self-attention" mechanism to weigh the importance of different inputs. State-of-the-art for NLP (clinical notes).</li>
+                        <li><strong>CNN:</strong> Convolutional filters for spatial data.</li>
+                        <li><strong>RNN/LSTM:</strong> Sequential data, hidden state for time-series.</li>
+                        <li><strong>Transformers:</strong> Self-attention for NLP.</li>
                     </ul>
                     <div class="chart-container" style="height: 300px;">
                         <canvas id="dlArchitecturesChart"></canvas>
@@ -298,33 +314,32 @@
             </div>
         </section>
 
+        <!-- Section 6: Other Models -->
         <section id="section6" class="mb-12 pt-16 -mt-16">
             <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">6. Beyond the Basics: Other Powerful Models</h2>
             <p class="text-lg mb-8 text-gray-700">
-                The healthcare industry also leverages other sophisticated techniques to analyze complex data, from identifying patient groups to understanding clinical notes.
+                Healthcare leverages other techniques to analyze complex data, from clustering to support vector machines.
             </p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-xl font-semibold mb-4 text-[#205A70]">K-Means Clustering (Unsupervised)</h3>
-                    <p class="text-gray-700 mb-4">An iterative algorithm to partition <span class="math-inline">\(N\)</span> data points into <span class="math-inline">\(K\)</span> clusters. It minimizes the <strong>Within-Cluster Sum of Squares (WCSS)</strong>:</p>
+                    <p class="text-gray-700 mb-4">Iteratively partition <span class="math-inline">\(N\)</span> points into <span class="math-inline">\(K\)</span> clusters, minimizing:</p>
                     <div class="math-formula">$$J = \sum_{k=1}^{K} \sum_{\mathbf{x}_i \in C_k} ||\mathbf{x}_i - \mathbf{\mu}_k||^2$$</div>
-                    <p class="text-gray-700 mb-4">Where <span class="math-inline">\(\mathbf{\mu}_k\)</span> is the <strong>centroid</strong> (mean) of cluster <span class="math-inline">\(C_k\)</span>. It iterates between:</p>
+                    <p class="text-gray-700 mb-4">Where <span class="math-inline">\(\mathbf{\mu}_k\)</span> is centroid of cluster <span class="math-inline">\(C_k\)</span>.</p>
                     <ol class="list-decimal list-inside text-gray-700 space-y-1">
-                        <li><strong>Assign Step:</strong> Assign each point <span class="math-inline">\(\mathbf{x}_i\)</span> to its nearest centroid <span class="math-inline">\(\mathbf{\mu}_k\)</span>.</li>
-                        <li><strong>Update Step:</strong> Recalculate each centroid <span class="math-inline">\(\mathbf{\mu}_k\)</span> as the mean of all points assigned to it.</li>
+                        <li><strong>Assign:</strong> Assign each <span class="math-inline">\(\mathbf{x}_i\)</span> to nearest centroid.</li>
+                        <li><strong>Update:</strong> Recalculate centroids as means.</li>
                     </ol>
                     <div class="chart-container">
                         <canvas id="kmeansChart"></canvas>
                     </div>
                 </div>
-
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Support Vector Machines (SVM)</h3>
-                    <p class="text-gray-700 mb-4">A classification model that finds the optimal hyperplane <span class="math-inline">\(\mathbf{w}^T\mathbf{x} - b = 0\)</span> that <strong>maximizes the margin</strong> (the distance) between the two classes.</p>
-                    <p class="text-gray-700 mb-4">This is a constrained optimization problem:</p>
+                    <p class="text-gray-700 mb-4">Find optimal hyperplane <span class="math-inline">\(\mathbf{w}^T\mathbf{x} - b = 0\)</span> maximizing the margin:</p>
+                    <p class="text-gray-700 mb-4">Constrained optimization:</p>
                     <div class="math-formula">$$\min_{\mathbf{w}, b} \frac{1}{2} ||\mathbf{w}||^2 \quad \text{s.t.} \quad y_i(\mathbf{w}^T\mathbf{x}_i - b) \ge 1$$</div>
-                    <p class="text-gray-700 mb-4">The <strong>Kernel Trick</strong> (e.g., RBF kernel) allows SVMs to find non-linear boundaries by implicitly mapping data to a higher-dimensional space.</p>
+                    <p class="text-gray-700 mb-4">The <strong>Kernel Trick</strong> allows nonlinear boundaries.</p>
                     <div class="chart-container">
                         <canvas id="svmChart"></canvas>
                     </div>
@@ -332,10 +347,11 @@
             </div>
         </section>
 
+        <!-- Section 7: Ethics -->
         <section id="section7" class="mb-12 pt-16 -mt-16">
             <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">7. Ethical & Practical Considerations</h2>
             <p class="text-lg mb-8 text-gray-700">
-                The mathematics are objective, but the data they are trained on is not. Biased data (e.g., under-representing certain demographics) will lead to a model <span class="math-inline">\(f\)</span> that minimizes loss for the majority group, performing poorly and unfairly for minorities.
+                The mathematics are objective, but training data and deployment can introduce bias and privacy risks.
             </p>
             <div class="grid grid-cols-1 gap-8">
                 <div class="bg-white rounded-lg shadow-md p-6">
@@ -349,12 +365,12 @@
                         <div class="p-4">
                             <span class="text-6xl">🔒</span>
                             <h4 class="font-bold text-xl my-2">Privacy & Security</h4>
-                            <p class="text-gray-600">Protecting sensitive patient data <span class="math-inline">\(\mathbf{x}_i\)</span>, often using techniques like differential privacy.</p>
+                            <p class="text-gray-600">Protecting sensitive patient data <span class="math-inline">\(\mathbf{x}_i\)</span>, often using differential privacy.</p>
                         </div>
                         <div class="p-4">
                             <span class="text-6xl">🔎</span>
                             <h4 class="font-bold text-xl my-2">Transparency</h4>
-                            <p class="text-gray-600">Using interpretable models (like trees, LIME, SHAP) to understand *why* <span class="math-inline">\(f(\mathbf{x})\)</span> made its prediction.</p>
+                            <p class="text-gray-600">Using interpretable models (trees, LIME, SHAP) to understand *why* <span class="math-inline">\(f(\mathbf{x})\)</span> made its prediction.</p>
                         </div>
                     </div>
                 </div>
@@ -397,7 +413,7 @@
                 return label;
               }
             };
-            
+
             const defaultChartOptions = {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -487,7 +503,7 @@
                     {x: -5, y: 0.05}, {x: -4, y: 0.1}, {x: -3, y: 0.15}, {x: -2, y: 0.3}, {x: -1, y: 0.4},
                     {x: 1, y: 0.6}, {x: 2, y: 0.7}, {x: 3, y: 0.85}, {x: 4, y: 0.9}, {x: 5, y: 0.95}
                 ];
-                
+
                 new Chart(ctxLogistic, {
                     type: 'scatter',
                     data: {
@@ -523,7 +539,7 @@
                 const classA = [{x: 2, y: 3}, {x: 3, y: 4}, {x: 4, y: 2}, {x: 2.5, y: 2}, {x: 3.5, y: 3}];
                 const classB = [{x: 7, y: 8}, {x: 8, y: 9}, {x: 9, y: 7}, {x: 7.5, y: 7}, {x: 8.5, y: 8}];
                 const unknown = [{x: 5, y: 6}];
-                
+
                 new Chart(ctxKnn, {
                     type: 'scatter',
                     data: {
@@ -652,11 +668,11 @@
                             }
                         },
                         scales: {
-                            x: { 
+                            x: {
                                 title: { display: true, text: 'Biomarker A' },
                                 grid: { display: false }
                             },
-                            y: { 
+                            y: {
                                 title: { display: true, text: 'Biomarker B' },
                                 grid: { color: '#eee' }
                             }
@@ -726,11 +742,11 @@
                             }
                         },
                         scales: {
-                            x: { 
+                            x: {
                                 title: { display: true, text: 'Tumor Radius' },
                                 grid: { display: false }
                             },
-                            y: { 
+                            y: {
                                 title: { display: true, text: 'Tumor Texture' },
                                 grid: { color: '#eee' }
                             }
@@ -743,5 +759,3 @@
     </script>
 </body>
 </html>
-
-
