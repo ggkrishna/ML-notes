@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Comprehensive Guide: Data Preprocessing in Healthcare</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+      .chart-container {
+        position: relative;
+        width: 100%;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        height: 350px;
+        max-height: 400px;
+      }
+      nav a {
+        transition: color 0.2s ease-in-out;
+      }
+      nav a:hover {
+        color: #F9A03F;
+      }
+      .code-snippet {
+        background-color: #0B2D48;
+        color: #F8F8F8;
+        border-left: 4px solid #F9A03F;
+        padding: 0.75rem 1rem;
+        margin: 1rem 0;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9em;
+        overflow-x: auto;
+        border-radius: 0 0.25rem 0.25rem 0;
+        text-align: left;
+      }
+      .code-keyword { color: #F9A03F; }
+      .code-comment { color: #9a9a9a; font-style: italic; }
+      .code-string { color: #56A0A9; }
+      .code-function { color: #C2C2C2; }
+    </style>
+</head>
+<body class="bg-[#F8F8F8] text-[#0B2D48] leading-relaxed">
+
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto p-6 md:p-10 text-center">
+            <h1 class="text-3xl md:text-5xl font-bold text-[#205A70] mb-3">
+                A Comprehensive Guide: Data Preprocessing
+            </h1>
+            <p class="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto">
+                Preparing healthcare data for machine learning with Scikit-learn.
+            </p>
+        </div>
+    </header>
+
+    <nav class="sticky top-0 bg-[#0B2D48] text-white p-4 shadow-lg z-10">
+        <div class="container mx-auto flex justify-center space-x-4 md:space-x-8 overflow-x-auto whitespace-nowrap">
+            <a href="#section1" class="font-medium px-2 py-1">Introduction</a>
+            <a href="#section2" class="font-medium px-2 py-1">Missing Data</a>
+            <a href="#section3" class="font-medium px-2 py-1">Categorical Data</a>
+            <a href="#section4" class="font-medium px-2 py-1">Feature Scaling</a>
+            <a href="#section5" class="font-medium px-2 py-1">Feature Engineering</a>
+            <a href="#section6" class="font-medium px-2 py-1">Imbalanced Data</a>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section id="section1" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">1. What is Data Preprocessing?</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                Data preprocessing is the critical first step in any machine learning pipeline. It involves cleaning, transforming, and formatting raw data into a clean, consistent, and usable dataset. Real-world healthcare data is almost always "dirty"—it can be incomplete, inconsistent, contain typos (e.g., 'Diabetic', 'Dibetec'), impossible values (e.g., `Age: 500`), or different units (e.g., `kg` vs. `lbs`).
+            </p>
+            <h3 class="text-2xl font-semibold mb-6 text-center text-gray-800">Why It's Non-Negotiable in Healthcare</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-[#F9A03F]">
+                    <h4 class="text-xl font-semibold mb-3 text-[#205A70]">Garbage In, Garbage Out (GIGO)</h4>
+                    <p class="text-gray-700">Models are only as good as their data. Biased, messy, or incomplete data will lead to dangerously inaccurate predictions. In healthcare, this can lead to misdiagnosis, incorrect risk stratification, or biased resource allocation.</p>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-[#56A0A9]">
+                    <h4 class="text-xl font-semibold mb-3 text-[#205A70]">Models Speak Math, Not Text</h4>
+                    <p class="text-gray-700">Algorithms can't understand 'Female', 'Type A', or 'High Risk'. They require numbers. Preprocessing translates this qualitative information into a quantitative format the model can understand.</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-[#205A70]">
+                    <h4 class="text-xl font-semibold mb-3 text-[#205A70]">Performance and Accuracy</h4>
+                    <p class="text-gray-700">Features on different scales (e.g., 'Age' 20-80 vs. 'Lab Value' 0.1-1.5) can bias a model. Scaling ensures all features are weighted fairly, leading to a more accurate and reliable model. The right method depends on the model and data.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="section2" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">2. Handling Missing Data (Imputation)</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                Healthcare data is notoriously messy. Lab tests may not be ordered (MAR), sensor readings can be lost (MCAR), or a patient may be too ill to answer a survey (MNAR). Models cannot handle these "NaN" (Not a Number) values, so we must fill them in, or "impute" them.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Naive Strategy: Dropping Data</h3>
+                    <p class="text-gray-700 mb-4">The simplest option is to drop rows (`.dropna(axis=0)`) or columns (`.dropna(axis=1)`) with missing values. This is <strong class="font-bold text-red-700">rarely a good idea</strong>, as you lose valuable patient information and can even introduce bias if the missingness isn't random.</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Simple Imputation (Mean/Median/Mode)</h3>
+                    <p class="text-gray-700 mb-4">We fill missing values with a statistic from that column. Use `strategy='median'` for numeric data with outliers, `mean` for normally distributed data, and `most_frequent` for categorical data.</p>
+                    <div class="code-snippet"><pre><code><span class="code-keyword">from</span> sklearn.impute <span class="code-keyword">import</span> SimpleImputer
+<span class="code-keyword">import</span> numpy <span class="code-keyword">as</span> np
+
+X = [[120, <span class="code-function">np.nan</span>], [124, 72.0], [<span class="code-function">np.nan</span>, 80.0], [130, 75.0]]
+<span class="code-comment"># Use median (robust to outliers)</span>
+imputer = SimpleImputer(strategy=<span class="code-string">'median'</span>)
+X_imputed = imputer.fit_transform(X)</code></pre></div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Advanced Imputation (KNN)</h3>
+                    <p class="text-gray-700 mb-4">`KNNImputer` finds the 'K' most similar patients (neighbors) and uses their values to fill the missing spot. This is context-aware. <strong class="font-bold text-red-700">Important:</strong> You must scale your data *before* using KNNImputer, as it's distance-based.</p>
+                    <div class="code-snippet"><pre><code><span class="code-keyword">from</span> sklearn.impute <span class="code-keyword">import</span> KNNImputer
+<span class="code-keyword">from</span> sklearn.preprocessing <span class="code-keyword">import</span> StandardScaler
+
+X = [[1.0, 2.0, <span class="code-function">np.nan</span>], [3.0, 4.0, 3.0], [4.0, 5.0, 4.0]]
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+imputer = KNNImputer(n_neighbors=2)
+X_imputed_scaled = imputer.fit_transform(X_scaled)</code></pre></div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Model-Based Imputation (Iterative)</h3>
+                    <p class="text-gray-700 mb-4">`IterativeImputer` is the most powerful. It treats the missing feature as a target variable (y) and all other features as (X), then trains a regression model (like Random Forest) to predict the missing value. It's powerful but computationally slower.</p>
+                    <div class="code-snippet"><pre><code><span class="code-comment"># Enable it: from sklearn.experimental import enable_iterative_imputer</span>
+<span class="code-keyword">from</span> sklearn.impute <span class="code-keyword">import</span> IterativeImputer
+<span class="code-keyword">from</span> sklearn.ensemble <span class="code-keyword">import</span> RandomForestRegressor
+
+imputer = IterativeImputer(
+    estimator=RandomForestRegressor(),
+    initial_strategy=<span class="code-string">'median'</span>,
+    max_iter=10, 
+    random_state=0
+)
+X_imputed = imputer.fit_transform(X)</code></pre></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section3" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">3. Encoding Categorical Data</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                Models understand numbers, not text. We must convert categorical features like "Blood Type" or "Triage Priority" into a numeric format.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Ordinal Encoding (For Order)</h3>
+                    <p class="text-gray-700 mb-4">Used for categorical data that has an *inherent order* (e.g., `low < medium < high`). We map each category to a single integer that respects this order. This is the correct choice for ordinal features.</p>
+                    <div class="code-snippet"><pre><code><span class="code-keyword">from</span> sklearn.preprocessing <span class="code-keyword">import</span> OrdinalEncoder
+
+data = [[<span class="code-string">'low'</span>], [<span class="code-string">'high'</span>], [<span class="code-string">'medium'</span>], [<span class="code-string">'low'</span>]]
+<span class="code-comment"># Define the explicit order</span>
+categories = [[<span class="code-string">'low'</span>, <span class="code-string">'medium'</span>, <span class="code-string">'high'</span>]]
+
+encoder = OrdinalEncoder(categories=categories)
+data_encoded = encoder.fit_transform(data)
+<span class="code-comment"># Result: [[0.], [2.], [1.], [0.]]</span></code></pre></div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">One-Hot Encoding (No Order)</h3>
+                    <p class="text-gray-700 mb-4">Used for *nominal* data (no order), like "Blood Type". It creates a new binary (0 or 1) column for each category. Use `drop='first'` to avoid multicollinearity in linear models.</p>
+                    <div class="code-snippet"><pre><code><span class="code-keyword">from</span> sklearn.preprocessing <span class="code-keyword">import</span> OneHotEncoder
+
+data = [[<span class="code-string">'A'</span>], [<span class="code-string">'B'</span>], [<span class="code-string">'AB'</span>], [<span class="code-string">'O'</span>]]
+
+encoder = OneHotEncoder(sparse_output=<span class="code-function">False</span>, drop=<span class="code-string">'first'</span>)
+data_encoded = encoder.fit_transform(data)
+<span class="code-comment"># Result (3 cols): [[0,0,0], [1,0,0], [0,1,0], [0,0,1]]</span>
+<span class="code-comment"># Categories: A(dropped), B, AB, O</span></code></pre></div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6 md:col-span-2">
+                    <h3 class="text-xl font-semibold mb-4 text-red-600">Warning: LabelEncoder vs. OneHotEncoder</h3>
+                    <p class="text-gray-700 mb-4">A common mistake is to use `LabelEncoder` on *features* (X). `LabelEncoder` turns `['A', 'B', 'O']` into `[0, 1, 2]`. This incorrectly tells the model that `O > B > A`, which is meaningless. <strong class="font-bold text-red-700">`LabelEncoder` should only be used to encode the target variable (y).</strong> Use `OneHotEncoder` for all nominal features.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="section4" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">4. Feature Scaling</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                Many models are sensitive to the scale of features. If 'Age' (20-80) is 100x larger than 'Lab Value' (0.1-1.5), the model will mistakenly think 'Age' is 100x more important. Scaling fixes this.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Before Scaling (Data is Skewed)</h3>
+                    <p class="text-gray-700 mb-4">Notice how the 'Age' (X-axis) is very spread out, while the 'Lab Value' (Y-axis) is compressed. An algorithm using Euclidean distance would be completely dominated by Age.</p>
+                    <div class="chart-container">
+                        <canvas id="scalingBeforeChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">After StandardScaler (Data is Centered)</h3>
+                    <p class="text-gray-700 mb-4">`StandardScaler` transforms each feature to have a mean of 0 and standard deviation of 1. Now, both features are on the same scale, and the model can learn their true relationship.</p>
+                    <div class="chart-container">
+                        <canvas id="scalingAfterChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Which Scaler to Use?</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-3">
+                        <li>
+                            <strong>StandardScaler:</strong> The default choice. Good for data that is roughly normally distributed.
+                        </li>
+                        <li>
+                            <strong>MinMaxScaler:</strong> Scales to a [0, 1] range. Often preferred for neural networks. Sensitive to outliers.
+                        </li>
+                        <li>
+                            <strong>RobustScaler:</strong> Uses median and interquartile range (IQR). This makes it <strong class="font-bold">robust to outliers</strong>. Use this if your data has many extreme, potentially erroneous, values.
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Which Models Need Scaling?</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-3">
+                        <li>
+                            <strong class="text-green-700">YES (Scaling is critical):</strong>
+                            Linear/Logistic Regression (with regularization), K-Nearest Neighbors (KNN), Support Vector Machines (SVMs), Neural Networks, Principal Component Analysis (PCA).
+                        </li>
+                        <li>
+                            <strong class="text-red-700">NO (Scaling doesn't matter):</strong>
+                            Decision Trees, Random Forests, Gradient Boosting (XGBoost, LightGBM). These models are tree-based and split on feature values, regardless of their scale.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="section5" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">5. Feature Engineering</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                This is the art of creating new, more informative features from the data you already have. A good feature can be the difference between a poor model and a great one. This often requires <strong class="font-bold">domain expertise</strong>—talking to doctors and nurses about what's clinically relevant.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Example: Date/Time Features (Pandas)</h3>
+                    <p class="text-gray-700 mb-4">An admission timestamp isn't just a time. It's a day of the week, an hour of the day, or a month. Risk of complications might be higher on a weekend or during a night shift. We can extract these with `pandas`.</p>
+                    <div class="code-snippet"><pre><code><span class="code-keyword">import</span> pandas <span class="code-keyword">as</span> pd
+df = pd.DataFrame({<span class="code-string">'admission_time'</span>: [<span class="code-string">'2023-01-01 02:00'</span>, <span class="code-string">'2023-01-03 14:00'</span>]})
+df[<span class="code-string">'admission_time'</span>] = pd.to_datetime(df[<span class="code-string">'admission_time'</span>])
+
+<span class="code-comment"># Create new features</span>
+df[<span class="code-string">'admission_hour'</span>] = df[<span class="code-string">'admission_time'</span>].dt.hour
+df[<span class="code-string">'admission_dayofweek'</span>] = df[<span class="code-string">'admission_time'</span>].dt.dayofweek
+<span class="code-comment"># [2, 14] and [6 (Sunday), 1 (Tuesday)]</span></code></pre></div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Example: Polynomial Features</h3>
+                    <p class="text-gray-700 mb-4">If a linear model can't capture a non-linear trend (e.g., risk is low, then high, then low again as a lab value changes), we can add squared (`x²`) or cubed (`x³`) terms. `PolynomialFeatures` helps create these and interaction terms (`a*b`).</p>
+                    <div class="code-snippet"><pre><code><span class="code-keyword">from</span> sklearn.preprocessing <span class="code-keyword">import</span> PolynomialFeatures
+
+X = [[2, 3]] <span class="code-comment"># [Age, BP]</span>
+poly = PolynomialFeatures(degree=2, include_bias=<span class="code-function">False</span>)
+X_poly = poly.fit_transform(X)
+<span class="code-comment"># Result: [[2, 3, 4, 6, 9]]</span>
+<span class="code-comment">#           [a, b, a^2, a*b, b^2]</span></code></pre></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section6" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">6. Handling Imbalanced Data</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                A critical problem in healthcare. If you're predicting a rare disease (1% of patients), a model that just guesses "no disease" every time is 99% accurate but clinically useless. We must rebalance the dataset or adjust the model.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Before Resampling (Imbalanced)</h3>
+                    <p class="text-gray-700 mb-4">The model will be heavily biased towards the "Negative" class and will likely ignore the few "Positive (Disease)" cases.</p>
+                    <div class="chart-container" style="height: 300px;">
+                        <canvas id="imbalanceBeforeChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">After SMOTE (Oversampled)</h3>
+                    <p class="text-gray-700 mb-4">SMOTE synthetically creates new "Positive" samples. Now the classes are 50/50, forcing the model to learn the patterns that identify the rare disease.</p>
+                    <div class="chart-container" style="height: 300px;">
+                        <canvas id="imbalanceAfterChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Method 1: Resampling (SMOTE)</h3>
+                    <p class="text-gray-700 mb-4">SMOTE (Oversampling) is popular. You can also do `RandomUnderSampler` (deletes majority samples), but this risks losing data. <strong class="font-bold text-red-700">Crucially: Only resample the *training* set.</strong></p>
+                    <div class="code-snippet"><pre><code><span class="code-comment"># Requires: pip install imbalanced-learn</span>
+<span class="code-keyword">from</span> imblearn.over_sampling <span class="code-keyword">import</span> SMOTE
+<span class="code-keyword">from</span> sklearn.model_selection <span class="code-keyword">import</span> train_test_split
+
+<span class="code-comment"># Split data FIRST</span>
+<span class="code-comment"># X_train, X_test, y_train, y_test = train_test_split(X, y)</span>
+
+smote = SMOTE(random_state=42)
+<span class="code-comment"># ONLY resample the training data</span>
+<span class="code-comment"># X_train_res, y_train_res = smote.fit_resample(X_train, y_train)</span>
+
+<span class="code-comment"># Train on resampled, test on original test set</span>
+<span class="code-comment"># model.fit(X_train_res, y_train_res)</span>
+<span class="code-comment"># model.score(X_test, y_test)</span></code></pre></div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Method 2: Adjust Model & Metrics</h3>
+                    <p class="text-gray-700 mb-4">Instead of changing the data, change the model. Many classifiers (like `RandomForest`) have a `class_weight='balanced'` parameter. This tells the model to penalize mistakes on the minority class more heavily.</p>
+                    <p class="text-gray-700 mb-4">Also, <strong class="font-bold text-red-700">stop using 'Accuracy'</strong>. Use metrics that are better for imbalanced data, like <strong class="font-bold">Precision, Recall, F1-Score,</strong> or the <strong class="font-bold">Precision-Recall Curve (AUPRC)</strong>.</p>
+                    <div class="code-snippet"><pre><code><span class="code-keyword">from</span> sklearn.ensemble <span class="code-keyword">import</span> RandomForestClassifier
+<span class="code-keyword">from</span> sklearn.metrics <span class="code-keyword">import</span> f1_score
+
+<span class="code-comment"># Let the model handle the imbalance</span>
+model = RandomForestClassifier(class_weight=<span class="code-string">'balanced'</span>, random_state=42)
+
+<span class="code-comment"># model.fit(X_train, y_train)</span>
+<span class="code-comment"># y_pred = model.predict(X_test)</span>
+
+<span class="code-comment"># Use a better metric than accuracy</span>
+<span class="code-comment"># print(f"F1 Score: {f1_score(y_test, y_pred)}")</span></code></pre></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center p-8 text-gray-600 bg-[#F8F8F8] border-t border-gray-200">
+        <p>This infographic provides a comprehensive Python overview of data preprocessing concepts.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const colorPrimary = '#205A70';
+            const colorSecondary = '#56A0A9';
+            const colorAccent = '#F9A03F';
+            const colorLight = '#C2C2C2';
+            const colorBg = 'rgba(86, 160, 169, 0.1)';
+
+            const tooltipTitleCallback = (tooltipItems) => {
+              const item = tooltipItems[0];
+              let label = item.chart.data.labels[item.dataIndex];
+              if (Array.isArray(label)) {
+                return label.join(' ');
+              } else {
+                return label;
+              }
+            };
+            
+            const defaultChartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: tooltipTitleCallback
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false }
+                    },
+                    y: {
+                        grid: { color: '#eee' }
+                    }
+                }
+            };
+
+            const processLabels = (labels, maxWidth = 16) => {
+                return labels.map(label => {
+                    if (label.length <= maxWidth) return label;
+                    let lines = [];
+                    let currentLine = '';
+                    const words = label.split(' ');
+                    for (const word of words) {
+                        if ((currentLine + ' ' + word).trim().length > maxWidth) {
+                            lines.push(currentLine.trim());
+                            currentLine = word;
+                        } else {
+                            currentLine = (currentLine + ' ' + word).trim();
+                        }
+                    }
+                    if (currentLine) lines.push(currentLine.trim());
+                    return lines;
+                });
+            };
+
+            const unscaledData = [
+                {x: 25, y: 1.2}, {x: 45, y: 0.8}, {x: 65, y: 1.5}, {x: 85, y: 0.9},
+                {x: 30, y: 1.1}, {x: 50, y: 1.0}, {x: 70, y: 1.3}, {x: 60, y: 0.7}
+            ];
+
+            const scaledData = [
+                {x: -1.25, y: 0.45}, {x: -0.25, y: -1.14}, {x: 0.75, y: 1.25}, {x: 1.75, y: -0.74},
+                {x: -1.0, y: 0.05}, {x: 0.0, y: -0.34}, {x: 1.0, y: 0.85}, {x: 0.5, y: -1.54}
+            ];
+            
+            if (document.getElementById('scalingBeforeChart')) {
+                const ctx = document.getElementById('scalingBeforeChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: 'Patient Data',
+                            data: unscaledData,
+                            backgroundColor: colorSecondary
+                        }]
+                    },
+                    options: {
+                        ...defaultChartOptions,
+                        scales: {
+                            x: { title: { display: true, text: 'Age (Range 20-90)' }, grid: { display: false } },
+                            y: { title: { display: true, text: 'Lab Value (Range 0.5-2.0)' }, grid: { color: '#eee' } }
+                        }
+                    }
+                });
+            }
+
+            if (document.getElementById('scalingAfterChart')) {
+                const ctx = document.getElementById('scalingAfterChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: 'Scaled Patient Data',
+                            data: scaledData,
+                            backgroundColor: colorPrimary
+                        }]
+                    },
+                    options: {
+                        ...defaultChartOptions,
+                        scales: {
+                            x: { title: { display: true, text: 'Scaled Age (Mean=0, Std=1)' }, grid: { display: false } },
+                            y: { title: { display: true, text: 'Scaled Lab Value (Mean=0, Std=1)' }, grid: { color: '#eee' } }
+                        }
+                    }
+                });
+            }
+
+            if (document.getElementById('imbalanceBeforeChart')) {
+                const ctx = document.getElementById('imbalanceBeforeChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Negative (Class 0)', 'Positive (Disease, Class 1)'],
+                        datasets: [{
+                            data: [950, 50],
+                            backgroundColor: [colorSecondary, colorAccent],
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: { callbacks: { title: tooltipTitleCallback }}
+                        }
+                    }
+                });
+            }
+
+            if (document.getElementById('imbalanceAfterChart')) {
+                const ctx = document.getElementById('imbalanceAfterChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Negative (Class 0)', 'Positive (Synthetically Added)'],
+                        datasets: [{
+                            data: [950, 950],
+                            backgroundColor: [colorSecondary, colorAccent],
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: { callbacks: { title: tooltipTitleCallback }}
+                        }
+                    }
+                });
+            }
+
+        });
+    </script>
+</body>
+</html>
+
+
+
