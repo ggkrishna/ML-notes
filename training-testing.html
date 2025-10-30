@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Practical Guide: Model Training & Evaluation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+      .chart-container {
+        position: relative;
+        width: 100%;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        height: 350px;
+        max-height: 400px;
+      }
+      nav a {
+        transition: color 0.2s ease-in-out;
+      }
+      nav a:hover {
+        color: #F9A03F;
+      }
+      .code-snippet {
+        background-color: #0B2D48;
+        color: #F8F8F8;
+        border-left: 4px solid #F9A03F;
+        padding: 0.75rem 1rem;
+        margin: 1rem 0;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9em;
+        overflow-x: auto;
+        border-radius: 0 0.25rem 0.25rem 0;
+        text-align: left;
+      }
+      .code-keyword { color: #F9A03F; }
+      .code-comment { color: #9a9a9a; font-style: italic; }
+      .code-string { color: #56A0A9; }
+      .code-function { color: #C2C2C2; }
+    </style>
+</head>
+<body class="bg-[#F8F8F8] text-[#0B2D48] leading-relaxed">
+
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto p-6 md:p-10 text-center">
+            <h1 class="text-3xl md:text-5xl font-bold text-[#205A70] mb-3">
+                A Practical Guide: Model Training & Evaluation
+            </h1>
+            <p class="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto">
+                From fitting models to measuring performance with Scikit-learn.
+            </p>
+        </div>
+    </header>
+
+    <nav class="sticky top-0 bg-[#0B2D48] text-white p-4 shadow-lg z-10">
+        <div class="container mx-auto flex justify-center space-x-4 md:space-x-8 overflow-x-auto whitespace-nowrap">
+            <a href="#section1" class="font-medium px-2 py-1">Train/Test Split</a>
+            <a href="#section2" class="font-medium px-2 py-1">Model Training</a>
+            <a href="#section3" class="font-medium px-2 py-1">Model Prediction</a>
+            <a href="#section4" class="font-medium px-2 py-1">Regression Metrics</a>
+            <a href="#section5" class="font-medium px-2 py-1">Classification Metrics</a>
+            <a href="#section6" class="font-medium px-2 py-1">Cross-Validation</a>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <!-- Section 1: Train/Test Split -->
+        <section id="section1" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">1. The Core Concept: Train/Test Split</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                The most important rule in machine learning is: <strong class="font-bold">never evaluate your model on the same data it was trained on.</strong> Doing so leads to <strong class="font-bold">overfitting</strong>, where the model simply "memorizes" the training data but fails to generalize to new, unseen patients. We simulate this by splitting our data into two parts:
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-[#56A0A9]">
+                    <h4 class="text-xl font-semibold mb-3 text-[#205A70]">Training Set (e.g., 80%)</h4>
+                    <p class="text-gray-700">The majority of the data. The model is allowed to see this data and learn the patterns within it. This is the "study material".</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-[#F9A03F]">
+                    <h4 class="text-xl font-semibold mb-3 text-[#205A70]">Test Set (e.g., 20%)</h4>
+                    <p class="text-gray-700">Held back completely. The model *never* sees this data during training. This is the "final exam" used to objectively measure the model's performance.</p>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Implementation with `train_test_split`</h3>
+                <p class="text-gray-700 mb-4">Scikit-learn makes this easy. `X` is our matrix of features (e.g., age, labs, vitals) and `y` is our target vector (e.g., 'has_disease').</p>
+                <div class="code-snippet"><pre><code><span class="code-keyword">from</span> sklearn.model_selection <span class="code-keyword">import</span> train_test_split
+
+<span class="code-comment"># Assume X (features) and y (target) are already loaded</span>
+<span class="code-comment"># test_size=0.2 means 20% of data goes to the test set</span>
+<span class="code-comment"># random_state=42 ensures the split is reproducible</span>
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, 
+    test_size=0.2, 
+    random_state=42,
+    stratify=y  <span class="code-comment"># IMPORTANT for classification!</span>
+)
+
+<span class="code-comment"># stratify=y ensures that the proportion of classes</span>
+<span class="code-comment"># (e.g., 5% disease) is the same in both train and test sets.</span></code></pre></div>
+            </div>
+        </section>
+
+        <!-- Section 2: Model Training -->
+        <section id="section2" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">2. Model Training: The `.fit()` Method</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                Training is the process of "learning." We show the model the `X_train` (features) and `y_train` (the answers) and ask it to find the mathematical relationship between them. In scikit-learn, this is done with the `.fit()` method.
+            </p>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-xl font-semibold mb-4 text-[#205A70]">The Consistent Scikit-learn API</h3>
+                <p class="text-gray-700 mb-4">Every scikit-learn model uses the same commands. This makes it incredibly easy to swap models and experiment.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <p class="text-gray-600 font-medium mb-2">Example 1: Logistic Regression</p>
+                        <div class="code-snippet"><pre><code><span class="code-keyword">from</span> sklearn.linear_model <span class="code-keyword">import</span> LogisticRegression
+
+<span class="code-comment"># 1. Initialize the model</span>
+log_reg = LogisticRegression(random_state=42)
+
+<span class="code-comment"># 2. Train the model on the training data</span>
+log_reg.fit(X_train, y_train)
+
+<span class="code-comment"># log_reg is now a "trained model"</span></code></pre></div>
+                    </div>
+                    <div>
+                        <p class="text-gray-600 font-medium mb-2">Example 2: Random Forest</p>
+                        <div class="code-snippet"><pre><code><span class="code-keyword">from</span> sklearn.ensemble <span class="code-keyword">import</span> RandomForestClassifier
+
+<span class="code-comment"># 1. Initialize the model</span>
+rf = RandomForestClassifier(random_state=42)
+
+<span class="code-comment"># 2. Train the model on the training data</span>
+rf.fit(X_train, y_train)
+
+<span class="code-comment"># rf is now a "trained model"</span></code></pre></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 3: Model Prediction -->
+        <section id="section3" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">3. Model Prediction: `.predict()` & `.predict_proba()`</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                Once the model is trained, we use it to make predictions on the unseen test data (`X_test`). We then compare these predictions to the true labels (`y_test`) to see how well it did.
+            </p>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Getting Predictions vs. Probabilities</h3>
+                <p class="text-gray-700 mb-4">There are two types of predictions. For healthcare risk stratification, probabilities are almost always more useful than a hard "yes" or "no" label.</p>
+                <div class="code-snippet"><pre><code><span class="code-comment"># Use the trained model (log_reg) from the previous step</span>
+
+<span class="code-comment"># --- Get final class predictions (0 or 1) ---</span>
+<span class="code-comment"># This gives the final "hard" label</span>
+y_pred = log_reg.predict(X_test)
+<span class="code-comment"># y_pred might look like: [0, 1, 0, 0, 1, ...]</span>
+
+
+<span class="code-comment"># --- Get class probabilities (MUCH more useful) ---</span>
+<span class="code-comment"># This gives the model's confidence for each class</span>
+y_proba = log_reg.predict_proba(X_test)
+<span class="code-comment"># y_proba might look like:</span>
+<span class="code-comment"># [[0.9, 0.1],  &lt;-- 90% chance of 0, 10% chance of 1</span>
+<span class="code-comment">#  [0.2, 0.8],  &lt;-- 20% chance of 0, 80% chance of 1</span>
+<span class="code-comment">#  [0.7, 0.3]]  &lt;-- 70% chance of 0, 30% chance of 1</span>
+
+<span class="code-comment"># We can then rank patients by their risk (e.g., the probability of class 1)</span>
+risk_scores = y_proba[:, 1]</code></pre></div>
+            </div>
+        </section>
+
+        <!-- Section 4: Regression Metrics -->
+        <section id="section4" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">4. Regression Metrics (For Continuous Values)</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                Used when predicting a number (e.g., "blood pressure," "length_of_stay"). We compare the model's predictions (`y_pred`) to the true values (`y_test`).
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Predicted vs. Actual Plot</h3>
+                    <p class="text-gray-700 mb-4">A good regression model's predictions should be close to the actual values. Plotting them on a scatter plot is the best way to see this. A perfect model would have all points on the 45-degree (y=x) line.</p>
+                    <div class="chart-container">
+                        <canvas id="regressionChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Key Regression Metrics</h3>
+                    <ul class="text-gray-700 space-y-3 mb-4">
+                        <li><strong>Mean Absolute Error (MAE):</strong> The average absolute difference between prediction and truth. <br><em class="text-sm text-gray-600">"On average, our model's prediction is off by 5.2 (e.g., mmHg)."</em></li>
+                        <li><strong>Mean Squared Error (MSE):</strong> Average of the *squared* errors. This heavily penalizes large, dangerous errors. Harder to interpret.</li>
+                        <li><strong>R-Squared (R²):</strong> What percentage of the variance in the target is explained by the model? <br><em class="text-sm text-gray-600">"Our model explains 78% of the variance in patient length of stay."</em></li>
+                    </ul>
+                    <div class="code-snippet"><pre><code><span class="code-keyword">from</span> sklearn.metrics <span class="code-keyword">import</span> mean_absolute_error, r2_score
+
+<span class="code-comment"># Assume y_test and y_pred are from a LinearRegression model</span>
+mae = mean_absolute_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+<span class="code-function">print</span>(f<span class="code-string">"MAE: {mae:.2f}"</span>)
+<span class="code-function">print</span>(f<span class="code-string">"R-Squared: {r2:.2f}"</span>)</code></pre></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Classification Metrics -->
+        <section id="section5" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">5. Classification Metrics (For Categories)</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                Used when predicting a class (e.g., "disease" vs. "no_disease"). <strong class="font-bold text-red-700">Warning:</strong> Never rely on "Accuracy" alone, especially with imbalanced data (like rare disease prediction).
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">The Confusion Matrix: A "Must-Use"</h3>
+                    <p class="text-gray-700 mb-4">This 2x2 grid is the most important tool. It shows you *where* your model is making mistakes.</p>
+                    <div class="grid grid-cols-2 gap-4 text-center">
+                        <div class="bg-green-100 p-4 rounded-lg">
+                            <p class="font-bold text-lg text-green-800">True Positive (TP)</p>
+                            <p class="text-gray-700 text-sm">Patient is SICK, we predicted SICK. (Correct!)</p>
+                        </div>
+                        <div class="bg-red-100 p-4 rounded-lg">
+                            <p class="font-bold text-lg text-red-800">False Positive (FP)</p>
+                            <p class="text-gray-700 text-sm">Patient is HEALTHY, we predicted SICK. (Type I Error)</p>
+                        </div>
+                        <div class="bg-red-100 p-4 rounded-lg">
+                            <p class="font-bold text-lg text-red-800">False Negative (FN)</p>
+                            <p class="text-gray-700 text-sm">Patient is SICK, we predicted HEALTHY. (Type II Error - <strong class="font-bold">DANGEROUS!</strong>)</p>
+                        </div>
+                        <div class="bg-green-100 p-4 rounded-lg">
+                            <p class="font-bold text-lg text-green-800">True Negative (TN)</p>
+                            <p class="text-gray-700 text-sm">Patient is HEALTHY, we predicted HEALTHY. (Correct!)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Precision vs. Recall vs. F1-Score</h3>
+                    <ul class="text-gray-700 space-y-3 mb-4">
+                        <li><strong>Precision:</strong> Of all the patients we *predicted* as SICK, what % were *actually* sick? (TP / (TP + FP)). <br><em class="text-sm text-gray-600">High precision avoids unneeded treatment (low FPs).</em></li>
+                        <li><strong>Recall (Sensitivity):</strong> Of all the patients who were *actually* SICK, what % did we *catch*? (TP / (TP + FN)). <br><em class="text-sm text-gray-600">High recall avoids missing sick patients (low FNs).</em></li>
+                        <li><strong>F1-Score:</strong> The harmonic mean of Precision and Recall. A good single metric to balance the two.</li>
+                    </ul>
+                    <div class="chart-container" style="height: 250px;">
+                        <canvas id="classificationChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6 md:col-span-2">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Implementation with `classification_report`</h3>
+                    <p class="text-gray-700 mb-4">This handy utility gives you all the key metrics in one go.</p>
+                    <div class="code-snippet"><pre><code><span class="code-keyword">from</span> sklearn.metrics <span class="code-keyword">import</span> classification_report, confusion_matrix
+
+<span class="code-comment"># Assume y_test and y_pred are from a classification model</span>
+<span class="code-function">print</span>(<span class="code-string">"Confusion Matrix:"</span>)
+<span class="code-function">print</span>(confusion_matrix(y_test, y_pred))
+
+<span class="code-function">print</span>(<span class="code-string">"\nClassification Report:"</span>)
+<span class="code-function">print</span>(classification_report(y_test, y_pred, target_names=[<span class="code-string">'Healthy'</span>, <span class="code-string">'Sick'</span>]))
+
+<span class="code-comment"># This will output a clean table with precision, recall, and f1-score</span>
+<span class="code-comment"># for both the 'Healthy' (0) and 'Sick' (1) classes.</span></code></pre></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Cross-Validation -->
+        <section id="section6" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">6. Better Evaluation: K-Fold Cross-Validation</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                A single `train_test_split` can be "lucky" or "unlucky." A more robust and reliable way to measure performance is <strong class="font-bold">K-Fold Cross-Validation</strong>. It uses the *entire* dataset for both training and validation, just not at the same time.
+            </p>
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h3 class="text-xl font-semibold mb-4 text-[#205A70]">The 5-Fold Cross-Validation Process</h3>
+                <ol class="list-decimal list-inside text-gray-700 space-y-2">
+                    <li>Split the *entire* dataset into 5 equal "folds".</li>
+                    <li><strong>Run 1:</strong> Train on Folds 1-4, Test on Fold 5. Get Score 1.</li>
+                    <li><strong>Run 2:</strong> Train on Folds 1,2,3,5, Test on Fold 4. Get Score 2.</li>
+                    <li><strong>Run 3:</strong> Train on Folds 1,2,4,5, Test on Fold 3. Get Score 3.</li>
+                    <li>...and so on for 5 runs.</li>
+                    <li>The final metric is the **average and standard deviation** of all 5 scores. This is much more stable than a single score.</li>
+                </ol>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Implementation with `cross_val_score`</h3>
+                    <p class="text-gray-700 mb-4">Scikit-learn automates this entire process. Note: We use the *entire* `X` and `y` dataset here, as `cross_val_score` handles the splitting internally.</p>
+                    <div class="code-snippet"><pre><code><span class="code-keyword">from</span> sklearn.model_selection <span class="code-keyword">import</span> cross_val_score
+<span class="code-keyword">from</span> sklearn.ensemble <span class="code-keyword">import</span> RandomForestClassifier
+
+<span class="code-comment"># 1. Initialize a new, untrained model</span>
+model = RandomForestClassifier(random_state=42)
+
+<span class="code-comment"># 2. Run 5-fold cross-validation (cv=5)</span>
+<span class="code-comment"># 'scoring="f1"' uses F1-score. Default is 'accuracy'.</span>
+scores = cross_val_score(
+    model, 
+    X, <span class="code-comment"># Use FULL dataset</span>
+    y, <span class="code-comment"># Use FULL dataset</span>
+    cv=5, 
+    scoring=<span class="code-string">'f1'</span>
+)
+
+<span class="code-function">print</span>(f<span class="code-string">"Folds Scores: {scores}"</span>)
+<span class="code-function">print</span>(f<span class="code-string">"Average F1: {scores.mean():.2f}"</span>)
+<span class="code-function">print</span>(f<span class="code-string">"Std Dev: {scores.std():.2f}"</span>)</code></pre></div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Visualizing CV Scores</h3>
+                    <p class="text-gray-700 mb-4">The average score gives the model's expected performance, while the standard deviation shows its *stability*. A low standard deviation is good!</p>
+                    <div class="chart-container">
+                        <canvas id="cvChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center p-8 text-gray-600 bg-[#F8F8F8] border-t border-gray-200">
+        <p>This infographic provides a Python overview of model training and evaluation concepts.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const colorPrimary = '#205A70';
+            const colorSecondary = '#56A0A9';
+            const colorAccent = '#F9A03F';
+            const colorLight = '#C2C2C2';
+            const colorBg = 'rgba(86, 160, 169, 0.1)';
+
+            const tooltipTitleCallback = (tooltipItems) => {
+              const item = tooltipItems[0];
+              let label = item.chart.data.labels[item.dataIndex];
+              if (Array.isArray(label)) {
+                return label.join(' ');
+              } else {
+                return label;
+              }
+            };
+            
+            const defaultChartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: tooltipTitleCallback
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false }
+                    },
+                    y: {
+                        grid: { color: '#eee' }
+                    }
+                }
+            };
+
+            // Chart for Section 4: Regression Metrics
+            if (document.getElementById('regressionChart')) {
+                const ctx = document.getElementById('regressionChart').getContext('2d');
+                const actuals = [100, 120, 130, 145, 160, 180, 200, 210, 230, 250];
+                const preds = [105, 115, 135, 140, 168, 175, 205, 215, 220, 245];
+                const scatterData = actuals.map((val, i) => ({x: val, y: preds[i]}));
+                const idealLine = [{x: 100, y: 100}, {x: 250, y: 250}];
+
+                new Chart(ctx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                        {
+                            label: 'Predicted vs. Actual',
+                            data: scatterData,
+                            backgroundColor: colorSecondary,
+                            pointRadius: 6
+                        },
+                        {
+                            label: 'Ideal Model (y=x)',
+                            data: idealLine,
+                            type: 'line',
+                            borderColor: colorAccent,
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            borderDash: [5, 5]
+                        }]
+                    },
+                    options: {
+                        ...defaultChartOptions,
+                        scales: {
+                            x: { title: { display: true, text: 'Actual Values' }, grid: { display: false } },
+                            y: { title: { display: true, text: 'Predicted Values' }, grid: { color: '#eee' } }
+                        }
+                    }
+                });
+            }
+
+            // Chart for Section 5: Classification Metrics
+            if (document.getElementById('classificationChart')) {
+                const ctx = document.getElementById('classificationChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Precision', 'Recall', 'F1-Score'],
+                        datasets: [{
+                            label: 'Class 1 ("Sick") Metrics',
+                            data: [0.75, 0.82, 0.78], // Example data
+                            backgroundColor: [colorPrimary, colorSecondary, colorAccent],
+                        }]
+                    },
+                    options: {
+                        ...defaultChartOptions,
+                         scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 1.0,
+                                title: { display: true, text: 'Score' }
+                            },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+
+            // Chart for Section 6: Cross-Validation
+            if (document.getElementById('cvChart')) {
+                const ctx = document.getElementById('cvChart').getContext('2d');
+                const cvScores = [0.85, 0.88, 0.82, 0.87, 0.84];
+                const avgScore = cvScores.reduce((a, b) => a + b, 0) / cvScores.length;
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Fold 1', 'Fold 2', 'Fold 3', 'Fold 4', 'Fold 5'],
+                        datasets: [
+                        {
+                            label: 'F1-Score per Fold',
+                            data: cvScores,
+                            backgroundColor: colorSecondary,
+                        },
+                        {
+                            label: 'Average F1-Score',
+                            data: cvScores.map(() => avgScore),
+                            type: 'line',
+                            borderColor: colorAccent,
+                            borderWidth: 3,
+                            pointRadius: 0
+                        }]
+                    },
+                    options: {
+                        ...defaultChartOptions,
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                min: 0.8,
+                                max: 0.9,
+                                title: { display: true, text: 'F1-Score' }
+                            },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+
+        });
+    </script>
+</body>
+</html>
+
