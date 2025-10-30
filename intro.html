@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Visual Guide: Machine Learning in Healthcare</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      }
+      .chart-container {
+        position: relative;
+        width: 100%;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        height: 300px;
+        max-height: 350px;
+      }
+      @media (min-width: 768px) {
+        .chart-container {
+          height: 350px;
+          max-height: 400px;
+        }
+      }
+      .flow-box {
+        border: 2px solid #205A70;
+        background-color: rgba(86, 160, 169, 0.1);
+        color: #0B2D48;
+      }
+      .flow-arrow {
+        color: #205A70;
+        font-size: 2rem;
+        line-height: 1;
+      }
+      .tree-node {
+        border: 2px solid #205A70;
+        background-color: white;
+        color: #0B2D48;
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        display: inline-block;
+        min-width: 100px;
+      }
+      .tree-branch {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0 0.5rem;
+      }
+      .tree-line {
+        height: 20px;
+        width: 2px;
+        background-color: #56A0A9;
+      }
+      .tree-line-h {
+        height: 2px;
+        background-color: #56A0A9;
+        width: 100%;
+      }
+      .neuron-layer {
+        background-color: rgba(86, 160, 169, 0.1);
+        border-radius: 0.5rem;
+        padding: 1rem 0.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+        min-width: 60px;
+      }
+      .neuron {
+        background-color: #205A70;
+        width: 20px;
+        height: 20px;
+        border-radius: 9999px;
+        border: 2px solid white;
+      }
+      nav a {
+        transition: color 0.2s ease-in-out;
+      }
+      nav a:hover {
+        color: #F9A03F;
+      }
+    </style>
+</head>
+<body class="bg-[#F8F8F8] text-[#0B2D48] leading-relaxed">
+
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto p-6 md:p-10 text-center">
+            <h1 class="text-3xl md:text-5xl font-bold text-[#205A70] mb-3">
+                A Visual Guide: Machine Learning in Healthcare
+            </h1>
+            <p class="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto">
+                An introduction to the core concepts of machine learning and their practical applications in transforming Health Care.
+            </p>
+        </div>
+    </header>
+
+    <nav class="sticky top-0 bg-[#0B2D48] text-white p-4 shadow-lg z-10">
+        <div class="container mx-auto flex justify-center space-x-4 md:space-x-8 overflow-x-auto whitespace-nowrap">
+            <a href="#section1" class="font-medium px-2 py-1">What is ML?</a>
+            <a href="#section2" class="font-medium px-2 py-1">Predictive Models</a>
+            <a href="#section3" class="font-medium px-2 py-1">KNN</a>
+            <a href="#section4" class="font-medium px-2 py-1">Decision Trees</a>
+            <a href="#section5" class="font-medium px-2 py-1">Deep Learning</a>
+            <a href="#section6" class="font-medium px-2 py-1">Other Models</a>
+            <a href="#section7" class="font-medium px-2 py-1">Ethics</a>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section id="section1" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">1. What is Machine Learning?</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                Machine learning (ML) is a type of artificial intelligence that allows computer systems to learn from data and experience, rather than being explicitly programmed with rules. This shift from "rule-based" to "data-driven" systems is key to solving complex healthcare challenges.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Rule-Based vs. Data-Driven Systems</h3>
+                    <div class="grid grid-cols-2 gap-4 text-center">
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">Rule-Based</h4>
+                            <div class="flow-box p-3 rounded-md font-medium shadow">Input: Patient Vitals</div>
+                            <div class="flow-arrow my-2">↓</div>
+                            <div class="flow-box p-3 rounded-md font-medium shadow-inner">IF Temp > 101<br>AND HR > 100<br>THEN Alert</div>
+                            <div class="flow-arrow my-2">↓</div>
+                            <div class="flow-box p-3 rounded-md font-medium shadow">Output: Sepsis Alert</div>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">Data-Driven (ML)</h4>
+                            <div class="flow-box p-3 rounded-md font-medium shadow">Input: 1000s of Patient Records</div>
+                            <div class="flow-arrow my-2">↓</div>
+                            <div class="flow-box p-3 rounded-md font-medium shadow-inner">ML Model Learns Patterns</div>
+                            <div class="flow-arrow my-2">↓</div>
+                            <div class="flow-box p-3 rounded-md font-medium shadow">Output: Sepsis Risk Score (e.g., 85%)</div>
+                        </div>
+                    </div>
+                    <p class="mt-6 text-gray-600">
+                        Rule-based systems are brittle and rely on human experts defining every possibility. Data-driven ML models can discover subtle patterns from vast datasets that experts might miss.
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Supervised vs. Unsupervised Learning</h3>
+                    <div class="grid grid-cols-2 gap-4 text-center">
+                        <div class="flex flex-col items-center p-4 bg-teal-50 rounded-lg">
+                            <span class="text-5xl mb-2">🏷️</span>
+                            <h4 class="font-bold text-lg mb-2">Supervised</h4>
+                            <p class="text-sm text-gray-600">Learns from <strong class="text-[#205A70]">labeled data</strong> (e.g., patient scans pre-labeled as 'tumor' or 'no tumor') to make predictions.</p>
+                            <p class="font-semibold mt-2">Example: Disease Prediction</p>
+                        </div>
+                        <div class="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
+                            <span class="text-5xl mb-2">🔍</span>
+                            <h4 class="font-bold text-lg mb-2">Unsupervised</h4>
+                            <p class="text-sm text-gray-600">Finds hidden patterns in <strong class="text-gray-700">unlabeled data</strong> (e.g., grouping patients based on similar genetic markers).</p>
+                            <p class="font-semibold mt-2">Example: Patient Clustering</p>
+                        </div>
+                    </div>
+                    <p class="mt-6 text-gray-600">
+                        Supervised learning is like a student learning with an answer key, while unsupervised learning is like a detective finding clues without knowing the crime.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="section2" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">2. Core Predictive Models: Regression</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                Regression models are a fundamental tool in supervised learning. They help us understand and predict relationships between variables. The two most common types are Linear and Logistic regression.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Linear Regression: Predicting Continuous Values</h3>
+                    <div class="chart-container">
+                        <canvas id="linearRegressionChart"></canvas>
+                    </div>
+                    <p class="mt-6 text-gray-600">
+                        This chart shows a positive correlation between patient age and systolic blood pressure. Linear regression (the red line) finds the best-fit line to predict a continuous value (like blood pressure) based on an input (like age).
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Logistic Regression: Predicting Binary Outcomes</h3>
+                    <div class="chart-container">
+                        <canvas id="logisticRegressionChart"></canvas>
+                    </div>
+                    <p class="mt-6 text-gray-600">
+                        This model predicts the probability of a binary outcome (e.g., 'High Diabetes Risk' vs. 'Low Risk'). It groups patients based on factors like glucose level, making it ideal for classification tasks.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="section3" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">3. Learning by Similarity: K-Nearest Neighbors (KNN)</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                KNN is an intuitive algorithm that classifies a new data point based on the majority class of its "K" closest neighbors. It's a simple yet powerful method for both classification and regression.
+            </p>
+            <div class="grid grid-cols-1 gap-8">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Classifying a New Patient with KNN</h3>
+                    <div class="chart-container">
+                        <canvas id="knnChart"></canvas>
+                    </div>
+                    <p class="mt-6 text-gray-600">
+                        In this plot, patients are clustered based on two biomarkers. To classify the 'Unknown Patient' (yellow), KNN would look at its 3 (or K) nearest neighbors. Since most of its neighbors are 'Class B' (blue), the algorithm would classify the new patient as Class B.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="section4" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">4. Interpretable Decisions: Trees and Forests</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                While some models are "black boxes," decision trees offer clear, human-readable rules. Random Forests build on this concept by combining many trees to create a more robust model.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Visualizing a Triage Decision Tree</h3>
+                    <div class="flex flex-col items-center text-center">
+                        <div class="tree-node">Chest Pain?</div>
+                        <div class="flex w-full justify-center">
+                            <div class="tree-branch w-1/2">
+                                <div class="tree-line"></div>
+                                <div class="font-medium text-sm text-[#205A70]">Yes</div>
+                                <div class="tree-line"></div>
+                                <div class="tree-node bg-[#205A70] text-white">Triage: High Priority</div>
+                            </div>
+                            <div class="tree-branch w-1/2">
+                                <div class="tree-line"></div>
+                                <div class="font-medium text-sm text-gray-600">No</div>
+                                <div class="tree-line"></div>
+                                <div class="tree-node">Fever > 101°F?</div>
+                            </div>
+                        </div>
+                         <div class="flex w-full justify-end">
+                             <div class="flex w-1/2 justify-center">
+                                <div class="tree-branch w-1/2">
+                                    <div class="tree-line"></div>
+                                    <div class="font-medium text-sm text-[#205A70]">Yes</div>
+                                    <div class="tree-line"></div>
+                                    <div class="tree-node bg-[#56A0A9] text-white">Triage: Medium</div>
+                                </div>
+                                <div class="tree-branch w-1/2">
+                                    <div class="tree-line"></div>
+                                    <div class="font-medium text-sm text-gray-600">No</div>
+                                    <div class="tree-line"></div>
+                                    <div class="tree-node bg-[#C2C2C2] text-black">Triage: Low</div>
+                                </div>
+                             </div>
+                        </div>
+                    </div>
+                    <p class="mt-6 text-gray-600">
+                        Decision trees are highly interpretable. You can follow the path from the "root" (Chest Pain?) to a "leaf" (the final triage level) to understand exactly why a decision was made.
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Ensemble Learning: Random Forest</h3>
+                    <div class="flex flex-col items-center text-center">
+                        <div class="font-medium text-gray-600 mb-2">Patient Data</div>
+                        <div class="flow-arrow -my-2">↓</div>
+                        <div class="flex space-x-2 md:space-x-4 my-4 justify-center">
+                            <div class="tree-node text-sm p-2 flex flex-col items-center">🌳<span class="font-bold">Tree 1</span><span class="text-xs">Votes: High</span></div>
+                            <div class="tree-node text-sm p-2 flex flex-col items-center">🌳<span class="font-bold">Tree 2</span><span class="text-xs">Votes: Medium</span></div>
+                            <div class="tree-node text-sm p-2 flex flex-col items-center">🌳<span class="font-bold">Tree 3</span><span class="text-xs">Votes: High</span></div>
+                        </div>
+                        <div class="flow-arrow -my-2">↓</div>
+                        <div class="flow-box p-3 rounded-md font-semibold shadow mt-4">
+                            Final Decision by Majority Vote<br>(Result: High Priority)
+                        </div>
+                    </div>
+                    <p class="mt-6 text-gray-600">
+                        A Random Forest combines hundreds of different decision trees, each trained on a random subset of data. The final prediction is made by a "majority vote," which improves accuracy and prevents errors from a single tree.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="section5" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">5. Introduction to Deep Learning</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                Deep learning is a more advanced subfield of ML that uses neural networks—structures inspired by the human brain—to find complex patterns in large datasets. It's especially powerful for tasks like image and speech recognition.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Anatomy of a Neural Network</h3>
+                    <div class="flex justify-around items-center text-center py-6">
+                        <div class="flex flex-col items-center">
+                            <h4 class="font-semibold mb-2">Input Layer</h4>
+                            <div class="neuron-layer">
+                                <div class="neuron"></div>
+                                <div class="neuron"></div>
+                                <div class="neuron"></div>
+                            </div>
+                            <span class="text-sm mt-1 text-gray-600">Patient Data</span>
+                        </div>
+                        <div class="text-3xl font-bold text-[#56A0A9] -mt-8">→</div>
+                        <div class="flex flex-col items-center">
+                            <h4 class="font-semibold mb-2">Hidden Layer(s)</h4>
+                            <div class="neuron-layer">
+                                <div class="neuron"></div>
+                                <div class="neuron"></div>
+                                <div class="neuron"></div>
+                                <div class="neuron"></div>
+                            </div>
+                            <span class="text-sm mt-1 text-gray-600">Pattern<br>Extraction</span>
+                        </div>
+                        <div class="text-3xl font-bold text-[#56A0A9] -mt-8">→</div>
+                        <div class="flex flex-col items-center">
+                            <h4 class="font-semibold mb-2">Output Layer</h4>
+                            <div class="neuron-layer">
+                                <div class="neuron"></div>
+                            </div>
+                             <span class="text-sm mt-1 text-gray-600">Prediction</span>
+                        </div>
+                    </div>
+                    <p class="mt-6 text-gray-600">
+                        Data flows from the input layer (e.g., pixels of a CT scan) through one or more hidden layers, where "neurons" process the information, to an output layer that provides the final prediction (e.g., 'disease detected').
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Top Deep Learning Applications</h3>
+                    <div class="chart-container">
+                        <canvas id="dlApplicationsChart"></canvas>
+                    </div>
+                    <p class="mt-6 text-gray-600">
+                        Deep learning excels at tasks with highly complex, unstructured data. Its greatest impact in healthcare is currently in medical image analysis (e.g., finding tumors in MRIs) and predictive monitoring from real-time patient data.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="section6" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">6. Beyond the Basics: Other Powerful Models</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                The models covered so far are foundational. The healthcare industry also leverages other sophisticated techniques to analyze complex data, from identifying patient groups to understanding clinical notes.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">K-Means Clustering (Unsupervised)</h3>
+                    <div class="chart-container">
+                        <canvas id="kmeansChart"></canvas>
+                    </div>
+                    <p class="mt-6 text-gray-600">
+                        This unsupervised model finds hidden patterns in unlabeled data. For example, it can analyze thousands of patient records and automatically group them into distinct "phenotypes" (e.g., 'Chronic Care', 'Acute Risk', 'Healthy') based on their shared characteristics.
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Support Vector Machines (SVM)</h3>
+                    <div class="chart-container">
+                        <canvas id="svmChart"></canvas>
+                    </div>
+                    <p class="mt-6 text-gray-600">
+                        SVM is a powerful classification algorithm. It works by finding the optimal "hyperplane" (a line, in 2D) that best separates two classes. This is widely used in tasks like classifying tumors as 'Benign' or 'Malignant' based on their features.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="section7" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold mb-4 text-[#205A70]">7. Ethical & Practical Considerations</h2>
+            <p class="text-lg mb-8 text-gray-700">
+                While powerful, ML models are not magic. Their deployment in healthcare carries significant responsibilities. We must ensure these tools are used safely, fairly, and transparently to build trust and improve patient outcomes.
+            </p>
+            <div class="grid grid-cols-1 gap-8">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-[#205A70]">Pillars of Responsible AI in Healthcare</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+                        <div class="p-4">
+                            <span class="text-5xl">🛡️</span>
+                            <h4 class="font-bold text-lg my-2">Data Privacy</h4>
+                            <p class="text-gray-600">Ensuring patient confidentiality and adhering to regulations like HIPAA. Data must be anonymized and securely handled.</p>
+                        </div>
+                        <div class="p-4">
+                            <span class="text-5xl">⚖️</span>
+                            <h4 class="font-bold text-lg my-2">Fairness & Bias</h4>
+                            <p class="text-gray-600">Models trained on biased data can perpetuate health disparities. We must actively audit and correct for bias.</p>
+                        </div>
+                        <div class="p-4">
+                            <span class="text-5xl">🔍</span>
+                            <h4 class="font-bold text-lg my-2">Transparency</h4>
+                            <p class="text-gray-600">Clinicians and patients need to understand *why* a model made a prediction, especially when using "black box" models.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center p-8 text-gray-600 bg-[#F8F8F8] border-t border-gray-200">
+        <p>Department of Bio-Medical Sciences, The Apollo University, Chittoor.</p>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const colorPrimary = '#205A70';
+            const colorSecondary = '#56A0A9';
+            const colorAccent = '#F9A03F';
+            const colorLight = '#C2C2C2';
+            const colorBg = 'rgba(86, 160, 169, 0.1)';
+            const colorRiskHigh = '#F9A03F';
+            const colorRiskLow = '#205A70';
+            const colorUnknown = '#FBC17D';
+
+            const tooltipTitleCallback = (tooltipItems) => {
+              const item = tooltipItems[0];
+              let label = item.chart.data.labels[item.dataIndex];
+              if (Array.isArray(label)) {
+                return label.join(' ');
+              } else {
+                return label;
+              }
+            };
+            
+            const defaultChartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: tooltipTitleCallback
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: '#eee'
+                        }
+                    }
+                }
+            };
+
+            if (document.getElementById('linearRegressionChart')) {
+                const ctxLinear = document.getElementById('linearRegressionChart').getContext('2d');
+                const ageVsBpData = [
+                    { x: 20, y: 120 }, { x: 25, y: 122 }, { x: 30, y: 125 }, { x: 35, y: 128 },
+                    { x: 40, y: 130 }, { x: 45, y: 131 }, { x: 50, y: 135 }, { x: 55, y: 138 },
+                    { x: 60, y: 140 }, { x: 65, y: 142 }, { x: 70, y: 144 }, { x: 75, y: 145 },
+                    { x: 42, y: 128 }, { x: 58, y: 141 }, { x: 33, y: 126 }
+                ];
+                const regressionLine = [
+                    { x: 20, y: 121 }, { x: 75, y: 145 }
+                ];
+
+                new Chart(ctxLinear, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Patient Data',
+                                data: ageVsBpData,
+                                backgroundColor: colorSecondary,
+                                type: 'scatter'
+                            },
+                            {
+                                label: 'Regression Line',
+                                data: regressionLine,
+                                backgroundColor: colorRiskHigh,
+                                borderColor: colorRiskHigh,
+                                type: 'line',
+                                fill: false,
+                                borderWidth: 3,
+                                pointRadius: 0
+                            }
+                        ]
+                    },
+                    options: {
+                        ...defaultChartOptions,
+                        scales: {
+                            x: { 
+                                title: { display: true, text: 'Age' },
+                                grid: { display: false }
+                            },
+                            y: { 
+                                title: { display: true, text: 'Systolic Blood Pressure' },
+                                grid: { color: '#eee' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (document.getElementById('logisticRegressionChart')) {
+                const ctxLogistic = document.getElementById('logisticRegressionChart').getContext('2d');
+                const lowRiskData = [
+                    { x: 80, y: 0.1 }, { x: 90, y: 0.05 }, { x: 95, y: 0.15 }, { x: 100, y: 0.1 },
+                    { x: 105, y: 0.2 }, { x: 110, y: 0.18 }, { x: 115, y: 0.25 }, { x: 120, y: 0.3 }
+                ];
+                const highRiskData = [
+                    { x: 125, y: 0.7 }, { x: 130, y: 0.8 }, { x: 140, y: 0.75 }, { x: 150, y: 0.85 },
+                    { x: 160, y: 0.9 }, { x: 170, y: 0.95 }, { x: 180, y: 0.88 }, { x: 190, y: 0.92 }
+                ];
+
+                new Chart(ctxLogistic, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Low Risk',
+                                data: lowRiskData,
+                                backgroundColor: colorRiskLow
+                            },
+                            {
+                                label: 'High Risk',
+                                data: highRiskData,
+                                backgroundColor: colorRiskHigh
+                            }
+                        ]
+                    },
+                    options: {
+                        ...defaultChartOptions,
+                        scales: {
+                            x: { 
+                                title: { display: true, text: 'Glucose Level' },
+                                grid: { display: false } 
+                            },
+                            y: {
+                                title: { display: true, text: 'Diabetes Risk Probability' },
+                                min: 0,
+                                max: 1,
+                                ticks: {
+                                    stepSize: 0.5
+                                },
+                                grid: { color: '#eee' }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            if (document.getElementById('knnChart')) {
+                const ctxKnn = document.getElementById('knnChart').getContext('2d');
+                const classA = [
+                    { x: 2, y: 3 }, { x: 2.5, y: 3.5 }, { x: 1.5, y: 2.5 }, { x: 3, y: 2 }, { x: 3.5, y: 3 }
+                ];
+                const classB = [
+                    { x: 7, y: 8 }, { x: 7.5, y: 8.5 }, { x: 6.5, y: 7.5 }, { x: 8, y: 7 }, { x: 8.5, y: 8 }
+                ];
+                const unknown = [
+                    { x: 5, y: 5.5 }
+                ];
+
+                new Chart(ctxKnn, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Class A (Healthy)',
+                                data: classA,
+                                backgroundColor: colorSecondary,
+                                pointRadius: 6
+                            },
+                            {
+                                label: 'Class B (Disease)',
+                                data: classB,
+                                backgroundColor: colorPrimary,
+                                pointRadius: 6
+                            },
+                            {
+                                label: 'Unknown Patient',
+                                data: unknown,
+                                backgroundColor: colorUnknown,
+                                pointRadius: 8,
+                                pointStyle: 'rectRot',
+                                borderWidth: 2,
+                                borderColor: colorAccent
+                            }
+                        ]
+                    },
+                    options: {
+                        ...defaultChartOptions,
+                        scales: {
+                            x: { 
+                                title: { display: true, text: 'Biomarker 1' },
+                                grid: { display: false }
+                            },
+                            y: { 
+                                title: { display: true, text: 'Biomarker 2' },
+                                grid: { color: '#eee' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (document.getElementById('dlApplicationsChart')) {
+                const ctxDlApps = document.getElementById('dlApplicationsChart').getContext('2d');
+                
+                const wrapLabel = (label, maxWidth = 16) => {
+                  if (label.length <= maxWidth) return label;
+                  const words = label.split(' ');
+                  let lines = [];
+                  let currentLine = '';
+                  for (const word of words) {
+                    if ((currentLine + ' ' + word).trim().length > maxWidth) {
+                      lines.push(currentLine.trim());
+                      currentLine = word;
+                    } else {
+                      currentLine = (currentLine + ' ' + word).trim();
+                    }
+                  }
+                  if (currentLine) lines.push(currentLine.trim());
+                  return lines;
+                };
+
+                const dlLabels = [
+                  'Medical Image Analysis', 
+                  'Predictive Monitoring', 
+                  'Genomic Sequencing', 
+                  'Drug Discovery'
+                ].map(l => wrapLabel(l));
+                
+                new Chart(ctxDlApps, {
+                    type: 'bar',
+                    data: {
+                        labels: dlLabels,
+                        datasets: [{
+                            label: 'Impact & Suitability Score',
+                            data: [90, 75, 70, 80],
+                            backgroundColor: [
+                                colorPrimary,
+                                colorAccent,
+                                colorSecondary,
+                                colorLight
+                            ],
+                            borderColor: colorPrimary,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        ...defaultChartOptions,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: tooltipTitleCallback
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: { display: true, text: 'Impact Score (out of 100)' },
+                                grid: { color: '#eee' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (document.getElementById('kmeansChart')) {
+                const ctxKmeans = document.getElementById('kmeansChart').getContext('2d');
+                new Chart(ctxKmeans, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Cluster 1',
+                                data: [{x: 2, y: 3}, {x: 2.5, y: 3.5}, {x: 1.5, y: 2.5}, {x: 3, y: 2}],
+                                backgroundColor: colorPrimary,
+                                pointRadius: 6
+                            },
+                            {
+                                label: 'Cluster 2',
+                                data: [{x: 7, y: 8}, {x: 7.5, y: 8.5}, {x: 6.5, y: 7.5}, {x: 8, y: 7}],
+                                backgroundColor: colorSecondary,
+                                pointRadius: 6
+                            },
+                            {
+                                label: 'Cluster 3',
+                                data: [{x: 2, y: 8}, {x: 3.5, y: 8.5}, {x: 1.5, y: 7.5}, {x: 3, y: 9}],
+                                backgroundColor: colorAccent,
+                                pointRadius: 6
+                            }
+                        ]
+                    },
+                    options: {
+                        ...defaultChartOptions,
+                        scales: {
+                            x: { 
+                                title: { display: true, text: 'Biomarker A' },
+                                grid: { display: false }
+                            },
+                            y: { 
+                                title: { display: true, text: 'Biomarker B' },
+                                grid: { color: '#eee' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (document.getElementById('svmChart')) {
+                const ctxSvm = document.getElementById('svmChart').getContext('2d');
+                new Chart(ctxSvm, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Benign',
+                                data: [{x: 2, y: 3}, {x: 2.5, y: 4.5}, {x: 1.5, y: 2.5}, {x: 3, y: 2}, {x: 4, y: 5}],
+                                backgroundColor: colorPrimary,
+                                type: 'scatter'
+                            },
+                            {
+                                label: 'Malignant',
+                                data: [{x: 7, y: 8}, {x: 7.5, y: 9.5}, {x: 6.5, y: 7.5}, {x: 8, y: 7}, {x: 6, y: 8.5}],
+                                backgroundColor: colorSecondary,
+                                type: 'scatter'
+                            },
+                            {
+                                label: 'SVM Hyperplane',
+                                data: [{x: 0, y: 6.5}, {x: 10, y: 4.5}],
+                                backgroundColor: colorAccent,
+                                borderColor: colorAccent,
+                                type: 'line',
+                                fill: false,
+                                borderWidth: 3,
+                                pointRadius: 0
+                            }
+                        ]
+                    },
+                    options: {
+                        ...defaultChartOptions,
+                        scales: {
+                            x: { 
+                                title: { display: true, text: 'Tumor Radius' },
+                                grid: { display: false }
+                            },
+                            y: { 
+                                title: { display: true, text: 'Tumor Texture' },
+                                grid: { color: '#eee' }
+                            }
+                        }
+                    }
+                });
+            }
+
+        });
+    </script>
+</body>
+</html>
+
